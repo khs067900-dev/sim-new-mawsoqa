@@ -14,7 +14,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin/", "/api/", "/checkout/verify/"],
       },
     ],
-    sitemap: "https://www.lamsa-smartt.com/sitemap.xml",
-    host: "https://www.lamsa-smartt.com",
+    sitemap: "https://alshareehasim.com/sitemap.xml",
+    host: "https://alshareehasim.com",
   };
 }
