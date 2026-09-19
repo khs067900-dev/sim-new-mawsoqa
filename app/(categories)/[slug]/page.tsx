@@ -5,7 +5,7 @@ import CategoryPageClient from "./CategoryPageClient";
 const SITE_URL = "https://basmathatify.com";
 // Fix 13: إزالة getCompany() من كل category page — كانت تُضيف DB call لكل slug
 // siteName ثابت — يمكن تحديثه هنا بدل جلبه من API في كل request
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "لمسه لبيع الشرائح";
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || "الشريحه الموثوقه";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;

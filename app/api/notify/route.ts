@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
   const formattedPhone = (whatsapp ?? "-").replace(/^(\+966|966)/, "0");
 
   const text = [
-    `🛒 متجر مؤسسة لمسه لبيع الشرائح`,
+    `🛒 متجر مؤسسة الشريحه الموثوقه`,
     `🔖 Order ID: ${ltr}#${orderId}`,
     ``,
     `💲 Total Amount: ${ltr}${total} SAR`,

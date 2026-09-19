@@ -20,7 +20,7 @@ async function getCompany() {
 
 export default async function Home() {
   const c = await getCompany();
-  const siteName = c.nameAr || "لمسه لبيع الشرائح";
+  const siteName = c.nameAr || "الشريحه الموثوقه";
   const logoUrl = c.logo
     ? (c.logo.startsWith("http") ? c.logo : `${BACKEND}${c.logo}`)
     : "";
