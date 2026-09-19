@@ -34,10 +34,12 @@ async function getCompany() {
 export async function generateMetadata(): Promise<Metadata> {
   const c = await getCompany();
 
-  const siteName = c.nameAr || "الشريحه الموثوقه";
+  // الاسم التجاري ثابت بغض النظر عن قيمة DB
+  const siteName = "الشريحه الموثوقه";
   const titleDefault = `${siteName} | أفضل متجر لبيع شرائح الاتصال في السعودية`;
   const description = c.details || "الشريحه الموثوقه - تسوق أفضل شرائح الاتصال وباقات الإنترنت من فيرجن وSTC وزين وموبايلي بأسعار مميزة. توصيل سريع لجميع مناطق المملكة العربية السعودية.";
-  const ogImage = `${SITE_URL}/logo.webp`;
+  // og:image بنسبة 1.91:1 (1200×630) — لا تستخدم الشعار المربع
+  const ogImage = `${SITE_URL}/og-image.webp`;
 
   return {
     metadataBase: new URL(SITE_URL),
