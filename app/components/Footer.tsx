@@ -59,7 +59,7 @@ export default async function Footer() {
           <div className="flex flex-col gap-4">
             <Image src="/logo.webp" alt="logo" width={72} height={72} className="object-contain" />
             <p className="text-sm leading-7 text-gray-600 whitespace-pre-line">
-              {c.details || "شرائح اتصال وإنترنت بأسعار منافسة، مع خدمة سريعة وآمنة ودعم عملاء مميز. ثقتكم غايتنا وخدمتكم أولويتنا"}
+              الشريحه الموثوقه — شرائح اتصال وإنترنت بأسعار منافسة وباقات تناسب احتياجك، مع خدمة سريعة وآمنة وتجربة شراء بكل سهولة وثقة.
             </p>
             <div className="flex flex-col gap-2">
               <a href="https://qr.saudibusiness.gov.sa/viewcr?nCrNumber=qkDdLTB2Uy+Be+pn809n2w==" target="_blank" rel="noreferrer"
