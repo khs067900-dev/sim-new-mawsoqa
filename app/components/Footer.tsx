@@ -57,7 +57,7 @@ export default async function Footer() {
 
           {/* Brand */}
           <div className="flex flex-col gap-4">
-            <Image src="/logo-re.webp" alt="logo" width={72} height={72} className="object-contain" />
+            <Image src="/logo.webp" alt="logo" width={72} height={72} className="object-contain" />
             <p className="text-sm leading-7 text-gray-600 whitespace-pre-line">
               {c.details || "شرائح اتصال وإنترنت بأسعار منافسة، مع خدمة سريعة وآمنة ودعم عملاء مميز. ثقتكم غايتنا وخدمتكم أولويتنا"}
             </p>

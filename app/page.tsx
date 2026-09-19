@@ -4,7 +4,7 @@ import HomeCategorySections from "./components/HomeCategorySections";
 import CustomerReviews from "./components/CustomerReviews";
 
 const BACKEND = process.env.BACKEND_URL || "http://localhost:5000";
-const SITE_URL = "https://www.lamsa-smartt.com";
+const SITE_URL = "https://alshareehasim.com";
 
 async function getCompany() {
   try {
