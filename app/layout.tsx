@@ -34,9 +34,9 @@ async function getCompany() {
 export async function generateMetadata(): Promise<Metadata> {
   const c = await getCompany();
 
-  const siteName = c.nameAr || "لمسه لبيع الشرائح";
+  const siteName = c.nameAr || "الشريحه الموثوقه";
   const titleDefault = `${siteName} | أفضل متجر لبيع شرائح الاتصال في السعودية`;
-  const description = c.details || "لمسه لبيع الشرائح - تسوق أفضل شرائح الاتصال وباقات الإنترنت من فيرجن وSTC وزين وموبايلي بأسعار مميزة. توصيل سريع لجميع مناطق المملكة العربية السعودية.";
+  const description = c.details || "الشريحه الموثوقه - تسوق أفضل شرائح الاتصال وباقات الإنترنت من فيرجن وSTC وزين وموبايلي بأسعار مميزة. توصيل سريع لجميع مناطق المملكة العربية السعودية.";
   const ogImage = `${SITE_URL}/logo.webp`;
 
   return {
@@ -47,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description,
     keywords: [
-      "لمسه", "لمسه لبيع الشرائح", "basmathatify", "بيع شرائح الاتصال",
+      "الشريحه الموثوقه", "شريحه موثوقه", "بيع شرائح الاتصال",
       "شرائح اتصال", "باقات إنترنت", "شريحة SIM", "شريحة بيانات",
       "فيرجن موبايل", "Virgin Mobile", "STC", "زين", "موبايلي",
       "إنترنت مفتوح", "باقة شهرية", "باقة سنوية", "5G", "4G",
