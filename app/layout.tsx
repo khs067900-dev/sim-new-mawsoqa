@@ -89,8 +89,8 @@ export async function generateMetadata(): Promise<Metadata> {
       title: titleDefault,
       description,
       images: [ogImage],
-      creator: "@lamsasimicard",
-      site: "@lamsasimicard",
+      creator: "@alshareehasim",
+      site: "@alshareehasim",
     },
     alternates: {
       canonical: SITE_URL,

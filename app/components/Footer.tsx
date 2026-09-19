@@ -158,7 +158,7 @@ export default async function Footer() {
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
           <div className="flex items-center gap-2">
             <p className="text-xs text-gray-400">
-              صنع بإتقان على <span className="font-semibold text-gray-500">| 2026 منصة سلة</span>
+              © 2026 <span className="font-semibold text-gray-500">الشريحه الموثوقه</span> — جميع الحقوق محفوظة
             </p>
           </div>
           <div className="flex items-center gap-2">

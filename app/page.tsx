@@ -29,7 +29,7 @@ export default async function Home() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: siteName,
-    alternateName: c.nameEn || "lamsa-simicard",
+    alternateName: c.nameEn || "alshareehasim",
     url: SITE_URL,
     logo: logoUrl,
     contactPoint: [
