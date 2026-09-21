@@ -57,9 +57,9 @@ export default async function Footer() {
 
           {/* Brand */}
           <div className="flex flex-col gap-4">
-            <Image src="/logo.webp" alt="logo" width={72} height={72} className="object-contain" />
+            <Image src="/logo.webp" alt="لمسة الثابتة" width={72} height={72} className="object-contain" />
             <p className="text-sm leading-7 text-gray-600 whitespace-pre-line">
-              الشريحه الموثوقه — شرائح اتصال وإنترنت بأسعار منافسة وباقات تناسب احتياجك، مع خدمة سريعة وآمنة وتجربة شراء بكل سهولة وثقة.
+              لمسة الثابتة — شرائح اتصال وإنترنت بأسعار منافسة وباقات تناسب احتياجك، مع خدمة سريعة وآمنة وتجربة شراء بكل سهولة وثقة.
             </p>
             <div className="flex flex-col gap-2">
               <a href="https://qr.saudibusiness.gov.sa/viewcr?nCrNumber=qkDdLTB2Uy+Be+pn809n2w==" target="_blank" rel="noreferrer"
@@ -158,7 +158,7 @@ export default async function Footer() {
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
           <div className="flex items-center gap-2">
             <p className="text-xs text-gray-400">
-              © 2026 <span className="font-semibold text-gray-500">الشريحه الموثوقه</span> — جميع الحقوق محفوظة
+              © 2026 <span className="font-semibold text-gray-500">لمسة الثابتة</span> — جميع الحقوق محفوظة
             </p>
           </div>
           <div className="flex items-center gap-2">

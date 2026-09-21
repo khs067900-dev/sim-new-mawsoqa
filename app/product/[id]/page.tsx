@@ -13,24 +13,15 @@ async function getProduct(id: string) {
   }
 }
 
-async function getCompany() {
-  try {
-    const r = await fetch(`${BACKEND}/api/admin/company`, { next: { revalidate: 3600 } });
-    return r.ok ? r.json() : {};
-  } catch {
-    return {};
-  }
-}
-
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  const [product, company] = await Promise.all([getProduct(id), getCompany()]);
+  const product = await getProduct(id);
 
   if (!product) {
     return { title: "المنتج غير موجود" };
   }
 
-  const siteName = company.nameAr || "الشريحه الموثوقه";
+  const siteName = "لمسة الثابتة";
   const title = product.name;
 
   const parts: string[] = [];
@@ -82,9 +73,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [product, company] = await Promise.all([getProduct(id), getCompany()]);
+  const product = await getProduct(id);
 
-  const siteName = company.nameAr || "الشريحه الموثوقه";
+  const siteName = "لمسة الثابتة";
   const price = product?.salePrice || product?.price || 0;
   const rawImg = product?.images?.[0] || product?.image || "";
   const imageUrl = rawImg.startsWith("http") ? rawImg : rawImg ? `${BACKEND}${rawImg}` : "";

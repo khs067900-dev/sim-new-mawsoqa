@@ -6,7 +6,7 @@ const SITE_URL = "https://alshareehasim.com";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "إتمام الطلب - أكمل عملية الشراء بأمان وسهولة | الشريحه الموثوقه",
+    title: "إتمام الطلب - أكمل عملية الشراء بأمان وسهولة | لمسة الثابتة",
     description: "أكمل عملية الشراء بأمان تام. دفع مشفر وآمن مع خيارات تقسيط مريحة بدون فوائد.",
     robots: { index: false, follow: false },
     alternates: { canonical: `${SITE_URL}/checkout` },

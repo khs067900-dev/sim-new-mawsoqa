@@ -3,8 +3,8 @@ import type { Product } from "../components/products/types";
 import { sortProducts } from "../lib/sortProducts";
 
 export const metadata = {
-  title: "شرائح الاتصال | الشريحه الموثوقه",
-  description: "اختر شريحتك المناسبة من جميع شركات الاتصالات السعودية من الشريحه الموثوقه وتمتع باتصال سريع وتغطية قوية في كل مكان",
+  title: "شرائح الاتصال | لمسة الثابتة",
+  description: "اختر شريحتك المناسبة من جميع شركات الاتصالات السعودية من لمسة الثابتة وتمتع باتصال سريع وتغطية قوية في كل مكان",
 };
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
