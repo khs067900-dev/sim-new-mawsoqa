@@ -1,28 +1,20 @@
 import { TrendingUp } from "lucide-react";
 import type { Product } from "./products/types";
 import ProductCard from "./products/ProductCard";
+import { sortProducts } from "../lib/sortProducts";
 
-// الـ IDs المطلوبة — تُرسل كـ query واحدة بدل 4 requests منفصلة
-const IDS = [
-  "6a943492832465e62427be05",
-  "6a9437e6cd7da0bf04e86916",
-  "6a9430ba2f39401999e29c50",
-  "6a94389df64d29e186524b77",
-];
+const BACKEND = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "https://burj-simicard-backend.vercel.app";
 
-const BACKEND = process.env.BACKEND_URL || "https://lamsa-simicard-backend-production.up.railway.app";
-
-// Fix 7: request واحدة بدل 4 — /api/products/by-ids?ids=id1,id2,id3,id4
 async function getMostDemanded(): Promise<Product[]> {
   try {
-    const idsParam = IDS.join(",");
-    const res = await fetch(`${BACKEND}/api/products/by-ids?ids=${idsParam}`, {
+    const res = await fetch(`${BACKEND}/api/products?limit=4`, {
       next: { revalidate: 300 },
       signal: AbortSignal.timeout(3000),
     });
     if (!res.ok) return [];
     const data = await res.json();
-    return Array.isArray(data) ? data : [];
+    const raw: Product[] = Array.isArray(data) ? data : Array.isArray(data.products) ? data.products : [];
+    return sortProducts(raw, true).slice(0, 4);
   } catch {
     return [];
   }
