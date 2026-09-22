@@ -200,12 +200,7 @@ export default function ProductCard({
               </div>
 
               {hasDiscount && savings > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.1 }}
-                  className="shrink-0 text-center"
-                >
+                <div className="shrink-0 text-center animate-fade-in-down">
                   <div className="text-[8px] text-gray-400 leading-none mb-0.5">وفّرت</div>
                   <div
                     className="text-[10px] font-black px-2 py-0.5 rounded-lg leading-none whitespace-nowrap"
@@ -217,7 +212,7 @@ export default function ProductCard({
                   >
                     {fmt(savings)} <img src="/money-icon.webp" alt="ر.س" className="inline w-3 h-3 object-contain align-middle" />
                   </div>
-                </motion.div>
+                </div>
               )}
             </div>
 
@@ -270,7 +265,7 @@ export default function ProductCard({
             </motion.button>
           </div>
         </Link>
-      </motion.div>
+      </div>
     </>
   );
 }

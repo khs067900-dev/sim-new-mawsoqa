@@ -22,7 +22,7 @@ const BACKEND = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "h
 async function getSections(): Promise<BrandSection[]> {
   try {
     const settingsRes = await fetch(`${BACKEND}/api/admin/brands/home-settings`, {
-      next: { revalidate: 300 },
+      next: { revalidate: 300, tags: ["brands-settings"] },
       signal: AbortSignal.timeout(3000),
     });
     if (!settingsRes.ok) return [];
@@ -35,7 +35,7 @@ async function getSections(): Promise<BrandSection[]> {
       visible.map(async (s) => {
         const res = await fetch(
           `${BACKEND}/api/products?brand=${encodeURIComponent(s.brand)}`,
-          { next: { revalidate: 300 }, signal: AbortSignal.timeout(3000) }
+          { next: { revalidate: 300, tags: ["products"] }, signal: AbortSignal.timeout(3000) }
         );
         const data = res.ok ? await res.json() : [];
         const raw: Product[] = Array.isArray(data) ? data : Array.isArray(data.products) ? data.products : [];
@@ -63,7 +63,7 @@ export default async function HomeCategorySections() {
             {sec.bannerImages && sec.bannerImages.length > 0 && (
               <div className="mb-6 sm:mb-10 rounded-2xl overflow-hidden flex flex-col gap-3">
                 {sec.bannerImages.map((url) => (
-                  <img key={url} src={url} alt={sec.brand} className="w-full object-cover" />
+                  <img key={url} src={url} alt={sec.brand} loading="lazy" decoding="async" className="w-full object-cover" />
                 ))}
               </div>
             )}

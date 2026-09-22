@@ -8,7 +8,7 @@ const BACKEND = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "h
 async function getMostDemanded(): Promise<Product[]> {
   try {
     const res = await fetch(`${BACKEND}/api/products?limit=4`, {
-      next: { revalidate: 300 },
+      next: { revalidate: 300, tags: ["products"] },
       signal: AbortSignal.timeout(3000),
     });
     if (!res.ok) return [];
