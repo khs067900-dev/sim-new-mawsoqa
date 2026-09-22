@@ -68,7 +68,7 @@ export default async function MostDemandedSection() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-5">
           {products.map((p, i) => (
             <ProductCard key={p._id} product={p} priority={i < 2} />
           ))}
