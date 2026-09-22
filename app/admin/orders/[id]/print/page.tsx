@@ -148,7 +148,7 @@ export default function PrintOrderPage() {
             </tr>
           </thead>
           <tbody>
-            {order.items.map((item, i) => (
+            {(order.items ?? []).map((item, i) => (
               <tr key={i} style={{ borderBottom: "1px solid #e5e7eb" }}>
                 <td style={{ padding: "4px 8px", textAlign: "right", borderLeft: "1px solid #e5e7eb", fontWeight: 600 }}>{item.name}</td>
                 <td style={{ padding: "4px 8px", textAlign: "right", borderLeft: "1px solid #e5e7eb" }}>{item.price.toFixed(2)}</td>

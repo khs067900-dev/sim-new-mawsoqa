@@ -29,7 +29,7 @@ export async function printReceiptVoucher(orderId: string) {
 
   const currency = company.currencyAr || "ريال";
   const amount = order.installmentType === "installment" ? order.downPayment : order.total;
-  const productNames = order.items.map((i: { name: string }) => i.name).join("، ");
+  const productNames = (order.items ?? []).map((i: { name: string }) => i.name).join("، ");
   const amountWords = toArabicWords(amount) + " فقط لا غير";
   const aboutText = `قيمة ${order.installmentType === "installment" ? "دفعة من " : ""}ثمن جهاز/أجهزة: ${productNames}`;
 

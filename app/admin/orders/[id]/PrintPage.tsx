@@ -145,7 +145,7 @@ export default function PrintPage({ order, fin, onClose }: PrintPageProps) {
               </tr>
             </thead>
             <tbody>
-              {order.items.map((item, i) => (
+              {(order.items ?? []).map((item, i) => (
                 <tr key={i} className="bg-white border-b border-gray-200">
                   <td className="px-2 py-1 text-right border-l border-gray-200 font-semibold" dir="rtl">{item.name}</td>
                   <td className="px-2 py-1 text-right border-l border-gray-200" dir="rtl">{item.price.toFixed(2)}</td>

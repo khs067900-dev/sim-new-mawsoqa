@@ -20,8 +20,15 @@ export default function OrderDetailPage() {
     fetch(`/api/admin/orders/${id}`)
       .then((r) => r.json())
       .then((d) => {
-        setOrder(d);
-        setFin({ total: d.total, downPayment: d.downPayment, months: d.months, monthlyPayment: d.monthlyPayment });
+        if (d && d._id) {
+          setOrder(d);
+          setFin({
+            total: d.total ?? 0,
+            downPayment: d.downPayment ?? 0,
+            months: d.months ?? 0,
+            monthlyPayment: d.monthlyPayment ?? 0,
+          });
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -135,7 +142,7 @@ export default function OrderDetailPage() {
       {/* ── ٣. المنتجات ── */}
       <Section icon={<IconBag />} iconBg="bg-orange-500" title="المنتجات">
         <div className="sm:hidden space-y-2">
-          {order.items.map((item, i) => (
+          {(order.items ?? []).map((item, i) => (
             <div key={i} className="bg-gray-50 rounded-lg p-3 flex justify-between items-start gap-2">
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-800 text-sm">{item.name}</p>
@@ -160,7 +167,7 @@ export default function OrderDetailPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {order.items.map((item, i) => (
+              {(order.items ?? []).map((item, i) => (
                 <tr key={i} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 font-medium text-gray-800">{item.name}</td>
                   <td className="px-4 py-3 text-gray-500">{item.price.toFixed(2)} ر.س</td>

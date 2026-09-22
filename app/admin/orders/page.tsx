@@ -72,7 +72,7 @@ export default function OrdersPage() {
       });
       if (!res.ok) throw new Error("فشل جلب الطلبات");
       const json = await res.json();
-      setData(json);
+      setData({ orders: [], total: 0, page: 1, limit: LIMIT, totalPages: 0, ...json, orders: Array.isArray(json?.orders) ? json.orders : [] } as OrdersResponse);
     } catch (err: unknown) {
       if (err instanceof Error && err.name === "AbortError") return;
       setError("تعذّر تحميل الطلبات، تحقق من الاتصال");

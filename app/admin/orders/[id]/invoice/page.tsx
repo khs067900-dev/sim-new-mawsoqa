@@ -172,7 +172,7 @@ export default function InvoicePrintPage() {
           </tr>
         </thead>
         <tbody>
-          {order.items.map((item, i) => (
+          {(order.items ?? []).map((item, i) => (
             <tr key={i} style={{ backgroundColor: i % 2 === 0 ? "#fff" : "#f9fafb" }}>
               <td style={{ ...td(i % 2 === 0 ? "#fff" : "#f9fafb"), textAlign: "center", width: 70 }}>
                 {item.image

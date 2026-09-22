@@ -29,7 +29,7 @@ export default function ContractPage() {
   const currency = company.currencyAr || "ريال";
   const remaining = order.total - (order.downPayment || 0);
   const monthly = order.monthlyPayment || (order.months > 0 ? Math.ceil(remaining / order.months) : remaining);
-  const productNames = order.items.map((i) => i.name).join("، ");
+  const productNames = (order.items ?? []).map((i) => i.name).join("، ");
 
   const now = new Date(order.createdAt);
   const firstPayment = new Date(now);
