@@ -66,7 +66,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: async () => {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     writeCache(null);
-    try { sessionStorage.removeItem("auth_register_draft"); } catch { /* ignore */ }
+    try {
+      localStorage.removeItem("auth_register_draft");
+      sessionStorage.removeItem("auth_register_draft");
+    } catch { /* ignore */ }
     set({ user: null, initialized: false });
   },
 }));

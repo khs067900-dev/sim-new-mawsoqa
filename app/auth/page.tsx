@@ -23,12 +23,38 @@ function OtpInputs({
 }) {
   const refs = useRef<(HTMLInputElement | null)[]>([]);
 
+  useEffect(() => {
+    // Focus the first empty digit or first digit on mount
+    const firstEmpty = otp.findIndex((d) => !d);
+    const targetIdx = firstEmpty === -1 ? 0 : firstEmpty;
+    setTimeout(() => refs.current[targetIdx]?.focus(), 50);
+  }, []);
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text");
+    const digits = pasted.replace(/\D/g, "").slice(0, 6);
+    if (!digits) return;
+    const next = [...otp];
+    for (let i = 0; i < 6; i++) {
+      next[i] = digits[i] || "";
+    }
+    setOtp(next);
+    setError("");
+    const focusIdx = Math.min(digits.length, 5);
+    refs.current[focusIdx]?.focus();
+    if (digits.length === 6) {
+      setTimeout(() => onComplete?.(), 50);
+    }
+  };
+
   const handleChange = (index: number, value: string) => {
     if (value.length > 1) {
       const digits = value.replace(/\D/g, "").slice(0, 6);
       if (digits.length === 6) {
         setOtp(digits.split(""));
         refs.current[5]?.focus();
+        setTimeout(() => onComplete?.(), 50);
         return;
       }
     }
@@ -37,23 +63,32 @@ function OtpInputs({
     next[index] = digit;
     setOtp(next);
     setError("");
-    if (digit && index < 5) refs.current[index + 1]?.focus();
+    if (digit && index < 5) {
+      refs.current[index + 1]?.focus();
+    }
+    if (next.every((d) => d.length === 1)) {
+      setTimeout(() => onComplete?.(), 50);
+    }
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0)
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
       refs.current[index - 1]?.focus();
-    if (e.key === "Enter" && otp.join("").length === 6) onComplete?.();
+    }
+    if (e.key === "Enter" && otp.join("").length === 6) {
+      onComplete?.();
+    }
   };
 
   return (
-    <div className="flex gap-2 justify-center" dir="ltr">
+    <div className="flex gap-2 justify-center" dir="ltr" onPaste={handlePaste}>
       {otp.map((digit, i) => (
         <input
           key={i}
           ref={(el) => { refs.current[i] = el; }}
           type="text"
           inputMode="numeric"
+          pattern="[0-9]*"
           autoComplete={i === 0 ? "one-time-code" : "off"}
           maxLength={6}
           value={digit}
@@ -189,9 +224,48 @@ type RegisterState = {
   phone: string;
   email: string;
   password: string;
+  otpExpiresAt?: number;
+  cooldownEndsAt?: number;
 };
 
 const REGISTER_STORAGE_KEY = "auth_register_draft";
+const OTP_VALID_DURATION_MS = 10 * 60 * 1000; // 10 minutes
+
+function loadRegisterDraft(defaultState: RegisterState): RegisterState {
+  if (typeof window === "undefined") return defaultState;
+  try {
+    const saved = localStorage.getItem(REGISTER_STORAGE_KEY) || sessionStorage.getItem(REGISTER_STORAGE_KEY);
+    if (!saved) return defaultState;
+    const parsed = JSON.parse(saved);
+
+    // If in OTP step, verify it has not expired
+    if (parsed.step === "otp") {
+      if (parsed.otpExpiresAt && Date.now() > parsed.otpExpiresAt) {
+        return { ...defaultState, ...parsed, step: "form" };
+      }
+      return { ...defaultState, ...parsed, step: "otp" };
+    }
+
+    return { ...defaultState, ...parsed };
+  } catch {
+    return defaultState;
+  }
+}
+
+function saveRegisterDraft(state: RegisterState) {
+  try {
+    const raw = JSON.stringify(state);
+    localStorage.setItem(REGISTER_STORAGE_KEY, raw);
+    sessionStorage.setItem(REGISTER_STORAGE_KEY, raw);
+  } catch { /* ignore */ }
+}
+
+function clearRegisterDraft() {
+  try {
+    localStorage.removeItem(REGISTER_STORAGE_KEY);
+    sessionStorage.removeItem(REGISTER_STORAGE_KEY);
+  } catch { /* ignore */ }
+}
 
 function RegisterForm({
   onSuccess,
@@ -219,15 +293,50 @@ function RegisterForm({
   const [otpError, setOtpError] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
+
+  const getRemainingCooldown = useCallback(() => {
+    if (!savedState.cooldownEndsAt) return 0;
+    const diff = Math.ceil((savedState.cooldownEndsAt - Date.now()) / 1000);
+    return diff > 0 ? diff : 0;
+  }, [savedState.cooldownEndsAt]);
+
+  const [cooldown, setCooldown] = useState<number>(getRemainingCooldown);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const emailDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (step === "form") setTimeout(() => firstNameRef.current?.focus(), 100);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [step]);
+
+  // Keep cooldown timer in sync with real-time, even when switching apps/tabs
+  useEffect(() => {
+    const sync = () => {
+      const rem = getRemainingCooldown();
+      setCooldown(rem);
+
+      // Check if OTP expired while app was in background or tab closed
+      if (step === "otp" && savedState.otpExpiresAt && Date.now() > savedState.otpExpiresAt) {
+        onStateChange({ step: "form" });
+        setGlobalError("انتهت صلاحية رمز التحقق، يرجى طلب رمز جديد");
+      }
+    };
+
+    sync();
+
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(sync, 1000);
+
+    const onVisibleOrFocus = () => sync();
+    window.addEventListener("focus", onVisibleOrFocus);
+    document.addEventListener("visibilitychange", onVisibleOrFocus);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      window.removeEventListener("focus", onVisibleOrFocus);
+      document.removeEventListener("visibilitychange", onVisibleOrFocus);
+    };
+  }, [getRemainingCooldown, step, savedState.otpExpiresAt, onStateChange]);
 
   // ── Live field validators ─────────────────────────────────────────────────
   const validateField = useCallback((name: string, value: string) => {
@@ -288,17 +397,6 @@ function RegisterForm({
     return valid;
   };
 
-  const startCooldown = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    setCooldown(COOLDOWN_SECONDS);
-    timerRef.current = setInterval(() => {
-      setCooldown((c) => {
-        if (c <= 1) { clearInterval(timerRef.current!); timerRef.current = null; return 0; }
-        return c - 1;
-      });
-    }, 1000);
-  }, []);
-
   const handleSendOtp = async () => {
     if (!validateAll()) return;
     setGlobalError("");
@@ -317,7 +415,11 @@ function RegisterForm({
       });
       const data = await res.json();
       if (!res.ok) {
-        // Handle email-already-exists from backend too
+        if (data.cooldown) {
+          const cooldownEndsAt = Date.now() + Number(data.cooldown) * 1000;
+          onStateChange({ cooldownEndsAt });
+          setCooldown(Number(data.cooldown));
+        }
         if (res.status === 409) {
           setErrors((prev) => ({ ...prev, email: "هذا البريد الإلكتروني مسجل مسبقًا" }));
         } else {
@@ -325,8 +427,10 @@ function RegisterForm({
         }
         return;
       }
-      onStateChange({ step: "otp" });
-      startCooldown();
+      const cooldownEndsAt = Date.now() + COOLDOWN_SECONDS * 1000;
+      const otpExpiresAt = Date.now() + OTP_VALID_DURATION_MS;
+      onStateChange({ step: "otp", cooldownEndsAt, otpExpiresAt });
+      setCooldown(COOLDOWN_SECONDS);
     } catch {
       setGlobalError("حدث خطأ، حاول مرة أخرى");
     } finally {
@@ -360,6 +464,7 @@ function RegisterForm({
         }
         return;
       }
+      clearRegisterDraft();
       onSuccess(data.user);
     } catch {
       setOtpError("حدث خطأ، حاول مرة أخرى");
@@ -386,8 +491,19 @@ function RegisterForm({
         }),
       });
       const data = await res.json();
-      if (!res.ok) { setOtpError(data.error || "حدث خطأ"); return; }
-      startCooldown();
+      if (!res.ok) {
+        if (data.cooldown) {
+          const cooldownEndsAt = Date.now() + Number(data.cooldown) * 1000;
+          onStateChange({ cooldownEndsAt });
+          setCooldown(Number(data.cooldown));
+        }
+        setOtpError(data.error || "حدث خطأ");
+        return;
+      }
+      const cooldownEndsAt = Date.now() + COOLDOWN_SECONDS * 1000;
+      const otpExpiresAt = Date.now() + OTP_VALID_DURATION_MS;
+      onStateChange({ cooldownEndsAt, otpExpiresAt });
+      setCooldown(COOLDOWN_SECONDS);
     } catch {
       setOtpError("حدث خطأ، حاول مرة أخرى");
     } finally {
@@ -417,7 +533,11 @@ function RegisterForm({
 
         <div className="flex items-center justify-between text-xs text-gray-400 pt-1 border-t border-[#f0f0f0]">
           <button
-            onClick={() => { setStep("form"); setOtp(["", "", "", "", "", ""]); setOtpError(""); }}
+            onClick={() => {
+              onStateChange({ step: "form" });
+              setOtp(["", "", "", "", "", ""]);
+              setOtpError("");
+            }}
             className="hover:text-[#0A1C29] transition-colors font-medium"
           >
             تعديل البيانات
@@ -919,27 +1039,33 @@ function AuthPageInner() {
   const searchParams = useSearchParams();
   const { user, initialized, setUser } = useAuthStore();
 
-  const [tab, setTab] = useState<Tab>("login");
+  const queryTab = searchParams.get("tab");
+  const [tab, setTab] = useState<Tab>(queryTab === "register" ? "register" : "login");
+
+  // Keep tab updated if query param changes
+  useEffect(() => {
+    if (queryTab === "register" || queryTab === "login") {
+      setTab(queryTab);
+    }
+  }, [queryTab]);
 
   const defaultRegisterState: RegisterState = {
-    step: "form", firstName: "", lastName: "", phone: "", email: "", password: "",
+    step: "form",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    password: "",
   };
 
   const [registerState, setRegisterState] = useState<RegisterState>(() => {
-    if (typeof window === "undefined") return defaultRegisterState;
-    try {
-      const saved = sessionStorage.getItem(REGISTER_STORAGE_KEY);
-      if (!saved) return defaultRegisterState;
-      const parsed = JSON.parse(saved);
-      // Never restore otp step — user must re-request OTP after refresh/tab switch
-      return { ...defaultRegisterState, ...parsed, step: "form" };
-    } catch { return defaultRegisterState; }
+    return loadRegisterDraft(defaultRegisterState);
   });
 
   const handleRegisterStateChange = (partial: Partial<RegisterState>) => {
     setRegisterState((prev) => {
       const next = { ...prev, ...partial };
-      try { sessionStorage.setItem(REGISTER_STORAGE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      saveRegisterDraft(next);
       return next;
     });
   };
@@ -958,7 +1084,7 @@ function AuthPageInner() {
 
   const handleSuccess = (user: object) => {
     setUser(user as Parameters<typeof setUser>[0]);
-    try { sessionStorage.removeItem(REGISTER_STORAGE_KEY); } catch { /* ignore */ }
+    clearRegisterDraft();
     const redirect = searchParams.get("redirect");
     const safe =
       redirect && redirect.startsWith("/") && !redirect.startsWith("//")
@@ -996,11 +1122,7 @@ function AuthPageInner() {
           {(["login", "register"] as Tab[]).map((t) => (
             <button
               key={t}
-              onClick={() => {
-                // Reset OTP step when switching tabs so stale OTP isn't reused
-                if (t === "login") handleRegisterStateChange({ step: "form" });
-                setTab(t);
-              }}
+              onClick={() => setTab(t)}
               className={`flex-1 py-3 text-sm font-semibold transition-colors border-b-2 -mb-px ${
                 tab === t
                   ? "border-[#0A1C29] text-[#0A1C29]"
