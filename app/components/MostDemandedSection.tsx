@@ -1,20 +1,43 @@
 import { TrendingUp } from "lucide-react";
 import type { Product } from "./products/types";
 import ProductCard from "./products/ProductCard";
-import { sortProducts } from "../lib/sortProducts";
 
 const BACKEND = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "https://burj-simicard-backend.vercel.app";
 
+function effectivePrice(p: Product): number {
+  return p.salePrice ?? p.originalPrice ?? 0;
+}
+
+function topByBrand(products: Product[], brandPattern: RegExp, count: number): Product[] {
+  return products
+    .filter((p) => brandPattern.test(p.brand ?? ""))
+    .sort((a, b) => effectivePrice(b) - effectivePrice(a))
+    .slice(0, count);
+}
+
 async function getMostDemanded(): Promise<Product[]> {
   try {
-    const res = await fetch(`${BACKEND}/api/products?limit=4`, {
+    const res = await fetch(`${BACKEND}/api/products`, {
       next: { revalidate: 300, tags: ["products"] },
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) return [];
     const data = await res.json();
-    const raw: Product[] = Array.isArray(data) ? data : Array.isArray(data.products) ? data.products : [];
-    return sortProducts(raw, true).slice(0, 4);
+    const all: Product[] = Array.isArray(data) ? data : Array.isArray(data.products) ? data.products : [];
+
+    // 1. أعلى سعر STC
+    const stcSorted = topByBrand(all, /stc/i, 2);
+    const stcTop    = stcSorted[0];   // أعلى سعر STC
+    const stcSecond = stcSorted[1];   // ثاني أعلى سعر STC
+
+    // 2. أعلى سعر موبايلي
+    const mobilyTop = topByBrand(all, /موبايلي/i, 1)[0];
+
+    // 3. أعلى سعر زين
+    const zainTop = topByBrand(all, /زين/i, 1)[0];
+
+    // الترتيب المطلوب: STC أعلى → موبايلي → زين → STC ثاني أعلى
+    return [stcTop, mobilyTop, zainTop, stcSecond].filter(Boolean) as Product[];
   } catch {
     return [];
   }
