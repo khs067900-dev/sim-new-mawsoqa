@@ -23,7 +23,8 @@ export default function HeroSection() {
               alt="hero"
               fill
               priority={i === 0}
-              quality={80}
+              loading={i === 0 ? "eager" : "lazy"}
+              quality={75}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) calc(100vw - 64px), calc(100vw - 128px)"
               className={`object-cover object-center transition-opacity duration-700 ${i === current ? "opacity-100" : "opacity-0"}`}
             />

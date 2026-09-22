@@ -5,14 +5,14 @@ import "./globals.css";
 // leaflet/dist/leaflet.css نُقل إلى checkout/layout.tsx — لا علاقة له بباقي الصفحات
 import ClientLayout from "./components/ClientLayout";
 import Footer from "./components/Footer";
+import { getCompanyData } from "./lib/company";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
-  weight: ["200", "300", "400", "500", "600", "700", "800", "900", "1000"],
+  weight: ["400", "600", "700", "800"],
   display: "swap",
 });
 
-const BACKEND = process.env.BACKEND_URL || "http://localhost:5000";
 const SITE_URL = "https://alshareehasim.com";
 
 export const viewport: Viewport = {
@@ -22,17 +22,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-async function getCompany() {
-  try {
-    const r = await fetch(`${BACKEND}/api/admin/company/public`, { next: { revalidate: 60, tags: ["company"] } });
-    return r.ok ? r.json() : {};
-  } catch {
-    return {};
-  }
-}
-
 export async function generateMetadata(): Promise<Metadata> {
-  const c = await getCompany();
+  const c = await getCompanyData();
 
   // الاسم التجاري ثابت بغض النظر عن قيمة DB
   const siteName = "لمسة الثابتة";
@@ -111,13 +102,16 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const company = await getCompanyData();
   return (
     <html lang="ar" dir="rtl">
       <head>
         <TikTokPixel />
       </head>
       <body className={`${cairo.className} antialiased`} suppressHydrationWarning>
-        <ClientLayout footer={<Footer />}>{children}</ClientLayout>
+        <ClientLayout footer={<Footer company={company} />} whatsapp={company.whatsapp}>
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );

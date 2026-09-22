@@ -1,19 +1,10 @@
 import Image from "next/image";
 import { FaWhatsapp, FaMobileAlt, FaEnvelope } from "react-icons/fa";
 
-const API = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { getCompanyData, type CompanyData } from "../lib/company";
 
-async function getCompany() {
-  try {
-    const r = await fetch(`${API}/api/admin/company/public`, { next: { revalidate: 60 }, signal: AbortSignal.timeout(3000) });
-    return r.ok ? r.json() : {};
-  } catch {
-    return {};
-  }
-}
-
-export default async function Footer() {
-  const c = await getCompany();
+export default async function Footer({ company }: { company?: CompanyData }) {
+  const c = company || (await getCompanyData());
 
   function ensureAbsolute(url: string) {
     if (!url) return "";

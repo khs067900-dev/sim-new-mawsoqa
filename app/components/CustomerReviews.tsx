@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { IoStar, IoStarOutline, IoAdd, IoCheckmarkCircle } from "react-icons/io5";
 
-interface Review {
+export interface Review {
   _id: string;
   name: string;
   comment: string;
@@ -26,8 +26,8 @@ function Stars({ rating, interactive = false, onRate }: { rating: number; intera
   );
 }
 
-export default function CustomerReviews() {
-  const [reviews, setReviews] = useState<Review[]>([]);
+export default function CustomerReviews({ initialReviews = [] }: { initialReviews?: Review[] }) {
+  const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", comment: "", rating: 5 });
   const [submitting, setSubmitting] = useState(false);
@@ -35,11 +35,12 @@ export default function CustomerReviews() {
   const [activeIdx, setActiveIdx] = useState(0);
 
   useEffect(() => {
+    if (initialReviews.length > 0) return;
     fetch("/api/reviews")
       .then((r) => r.json())
       .then((data) => Array.isArray(data) && setReviews(data))
       .catch(() => {});
-  }, []);
+  }, [initialReviews.length]);
 
   useEffect(() => {
     if (reviews.length <= 1) return;

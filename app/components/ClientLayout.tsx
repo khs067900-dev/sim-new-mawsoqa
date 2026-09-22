@@ -5,7 +5,15 @@ import WhatsappButton from "./WhatsappButton";
 import AddToCartPopup from "./AddToCartPopup";
 import AuthProvider from "./auth/AuthProvider";
 
-export default function ClientLayout({ children, footer }: { children: React.ReactNode; footer: React.ReactNode }) {
+export default function ClientLayout({
+  children,
+  footer,
+  whatsapp,
+}: {
+  children: React.ReactNode;
+  footer: React.ReactNode;
+  whatsapp?: string;
+}) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
   const isFileView = pathname.startsWith("/file-view");
@@ -19,7 +27,7 @@ export default function ClientLayout({ children, footer }: { children: React.Rea
       {!hideChrome && <Navbar />}
       {children}
       {!hideChrome && !isAuth && footer}
-      {!hideChrome && !isAuth && <WhatsappButton />}
+      {!hideChrome && !isAuth && <WhatsappButton defaultWhatsapp={whatsapp} />}
       {!hideChrome && !isAuth && <AddToCartPopup />}
     </AuthProvider>
   );

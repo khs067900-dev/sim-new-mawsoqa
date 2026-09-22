@@ -1,25 +1,31 @@
 import HeroSection from "./components/HeroSection";
 import MostDemandedSection from "./components/MostDemandedSection";
 import HomeCategorySections from "./components/HomeCategorySections";
-import CustomerReviews from "./components/CustomerReviews";
+import CustomerReviews, { type Review } from "./components/CustomerReviews";
+import { getCompanyData } from "./lib/company";
 
-const BACKEND = process.env.BACKEND_URL || "http://localhost:5000";
+const BACKEND =
+  process.env.BACKEND_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://lamsa-simicard-backend-production.up.railway.app";
 const SITE_URL = "https://alshareehasim.com";
 
-async function getCompany() {
+async function getReviews(): Promise<Review[]> {
   try {
-    const r = await fetch(`${BACKEND}/api/admin/company/public`, {
-      next: { revalidate: 3600 },
-      signal: AbortSignal.timeout(2000),
+    const res = await fetch(`${BACKEND}/api/admin/reviews`, {
+      next: { revalidate: 300, tags: ["reviews"] },
+      signal: AbortSignal.timeout(3000),
     });
-    return r.ok ? r.json() : {};
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
   } catch {
-    return {};
+    return [];
   }
 }
 
 export default async function Home() {
-  const c = await getCompany();
+  const [c, reviews] = await Promise.all([getCompanyData(), getReviews()]);
   const siteName = "لمسة الثابتة";
   const logoUrl = c.logo
     ? (c.logo.startsWith("http") ? c.logo : `${BACKEND}${c.logo}`)
@@ -86,7 +92,7 @@ export default async function Home() {
         <HeroSection />
         <MostDemandedSection />
         <HomeCategorySections />
-        <CustomerReviews />
+        <CustomerReviews initialReviews={reviews} />
       </main>
     </>
   );

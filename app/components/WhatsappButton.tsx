@@ -2,12 +2,17 @@
 import { useEffect } from "react";
 import { useCompanyStore } from "../store/companyStore";
 
-export default function WhatsappButton() {
+export default function WhatsappButton({ defaultWhatsapp }: { defaultWhatsapp?: string }) {
   const { whatsapp, fetchCompany } = useCompanyStore();
 
-  useEffect(() => { fetchCompany(); }, [fetchCompany]);
+  useEffect(() => {
+    if (!defaultWhatsapp) {
+      fetchCompany();
+    }
+  }, [defaultWhatsapp, fetchCompany]);
 
-  const number = whatsapp ? whatsapp.replace(/\D/g, "") : "966583054073";
+  const effectiveWhatsapp = defaultWhatsapp || whatsapp;
+  const number = effectiveWhatsapp ? effectiveWhatsapp.replace(/\D/g, "") : "966583054073";
 
   return (
     <a

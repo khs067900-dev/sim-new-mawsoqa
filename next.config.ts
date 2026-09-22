@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  compress: true,
   outputFileTracingRoot: path.join(__dirname),
   experimental: {
     serverActions: {
@@ -20,6 +21,8 @@ const nextConfig: NextConfig = {
     };
   },
   images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 2592000,
     qualities: [75, 80, 85, 90, 100],
     remotePatterns: [
       { hostname: "ibb.co" },
