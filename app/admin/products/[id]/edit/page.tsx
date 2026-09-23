@@ -81,12 +81,6 @@ export default function EditProductPage() {
           taxIncluded: product.taxIncluded === false ? "false" : "true",
           installmentAvailable: product.installment?.available === true ? "true" : "false",
           installmentMonths: product.installment?.months?.toString() || "",
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  }
-
-  async function uploadImage(file: File): Promise<string> {
-    const fd = new FormData();
     fd.append("image", file);
     const res = await fetch("/api/admin/products/upload-image", {
       method: "POST",
