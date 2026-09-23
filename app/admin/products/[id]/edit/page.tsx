@@ -4,10 +4,10 @@ import { useRouter, useParams } from "next/navigation";
 import toast from "react-hot-toast";
 
 type SubCat = { name: string; category: string };
-type GalleryItem = { url: string; caption: string };
+
 type SpecItem = { label: string; value: string };
 type SpecGroup = { groupName: string; items: SpecItem[] };
-type ReviewItem = { name: string; rate: number | string; comment: string; date: string };
+
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -27,30 +27,34 @@ export default function EditProductPage() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<SubCat[]>([]);
 
-  const [form, setForm] = useState({
+    const [form, setForm] = useState({
     name: "",
     brief: "",
     originalPrice: "",
     salePrice: "",
     category: "",
+    subCategory: "",
+    brand: "",
     description: "",
     inStock: "true",
+    isFeatured: "false",
+    sortOrder: "0",
+    freeDelivery: "true",
+    deliveryTime: "24 ساعة",
+    warrantyYears: "1",
+    taxIncluded: "true",
+    installmentAvailable: "false",
+    installmentMonths: "",
   });
 
-  const [gallery, setGallery] = useState<GalleryItem[]>([
-    { url: "", caption: "" },
-    { url: "", caption: "" },
-    { url: "", caption: "" },
-  ]);
+  
 
   const [specifications, setSpecifications] = useState<SpecGroup[]>([
     { groupName: "", items: [{ label: "", value: "" }] },
   ]);
 
   const [rating, setRating] = useState({ average: "", count: "" });
-  const [reviews, setReviews] = useState<ReviewItem[]>([
-    { name: "", rate: "", comment: "", date: "" },
-  ]);
+  
 
   useEffect(() => {
     Promise.all([
@@ -65,8 +69,18 @@ export default function EditProductPage() {
           originalPrice: (product.originalPrice || product.price || "").toString(),
           salePrice: product.salePrice?.toString() || "",
           category: product.category || "",
+          subCategory: product.subCategory || "",
+          brand: product.brand || "",
           description: product.description || "",
           inStock: product.inStock === false ? "false" : "true",
+          isFeatured: product.isFeatured === true ? "true" : "false",
+          sortOrder: product.sortOrder?.toString() || "0",
+          freeDelivery: product.freeDelivery === false ? "false" : "true",
+          deliveryTime: product.deliveryTime || "24 ساعة",
+          warrantyYears: product.warrantyYears?.toString() || "1",
+          taxIncluded: product.taxIncluded === false ? "false" : "true",
+          installmentAvailable: product.installment?.available === true ? "true" : "false",
+          installmentMonths: product.installment?.months?.toString() || "",
         });
 
         const mainImg = product.image || product.images?.[0] || "";

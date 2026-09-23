@@ -4,10 +4,10 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 type SubCat = { name: string; category: string };
-type GalleryItem = { url: string; caption: string };
+
 type SpecItem = { label: string; value: string };
 type SpecGroup = { groupName: string; items: SpecItem[] };
-type ReviewItem = { name: string; rate: number | string; comment: string; date: string };
+
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -25,30 +25,34 @@ export default function NewProductPage() {
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<SubCat[]>([]);
 
-  const [form, setForm] = useState({
+    const [form, setForm] = useState({
     name: "",
     brief: "",
     originalPrice: "",
     salePrice: "",
     category: "",
+    subCategory: "",
+    brand: "",
     description: "",
     inStock: "true",
+    isFeatured: "false",
+    sortOrder: "0",
+    freeDelivery: "true",
+    deliveryTime: "24 ساعة",
+    warrantyYears: "1",
+    taxIncluded: "true",
+    installmentAvailable: "false",
+    installmentMonths: "",
   });
 
-  const [gallery, setGallery] = useState<GalleryItem[]>([
-    { url: "", caption: "" },
-    { url: "", caption: "" },
-    { url: "", caption: "" },
-  ]);
+  
 
   const [specifications, setSpecifications] = useState<SpecGroup[]>([
     { groupName: "", items: [{ label: "", value: "" }] },
   ]);
 
   const [rating, setRating] = useState({ average: "", count: "" });
-  const [reviews, setReviews] = useState<ReviewItem[]>([
-    { name: "", rate: "", comment: "", date: "" },
-  ]);
+  
 
   useEffect(() => {
     fetch("/api/admin/sub-categories", { credentials: "include" })
@@ -176,14 +180,27 @@ export default function NewProductPage() {
     if (!form.name || !form.originalPrice) return toast.error("الاسم والسعر مطلوبان");
     setSaving(true);
     try {
-      const body: Record<string, unknown> = {
+            const body: Record<string, unknown> = {
         name: form.name,
         brief: form.brief,
         originalPrice: Number(form.originalPrice),
         price: Number(form.salePrice || form.originalPrice),
         category: form.category,
+        subCategory: form.subCategory,
+        brand: form.brand,
         description: form.description,
         inStock: form.inStock === "true",
+        isFeatured: form.isFeatured === "true",
+        sortOrder: Number(form.sortOrder) || 0,
+        freeDelivery: form.freeDelivery === "true",
+        deliveryTime: form.deliveryTime,
+        warrantyYears: Number(form.warrantyYears) || 1,
+        taxIncluded: form.taxIncluded === "true",
+        installment: {
+          available: form.installmentAvailable === "true",
+          months: Number(form.installmentMonths) || 0,
+          conditions: []
+        }
       };
       if (form.salePrice) body.salePrice = Number(form.salePrice);
       if (imageUrl) body.image = imageUrl;
