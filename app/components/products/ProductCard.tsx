@@ -13,7 +13,7 @@ import type { Product } from "./types";
 import { useCartStore } from "../../store/cartStore";
 import { useCartPopupStore } from "../../store/cartPopupStore";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://alshareehasim-backend.vercel.app";
 const resolveImgUrl = (src: string) => {
   if (src.startsWith("http")) return encodeURI(decodeURI(src));
   const path = src.startsWith("/") ? src : "/" + src;

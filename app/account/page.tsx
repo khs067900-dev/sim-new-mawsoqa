@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuthStore } from "../store/authStore";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://alshareehasim-backend.vercel.app";
 
 function resolveImg(src?: string | null) {
   if (!src) return null;
