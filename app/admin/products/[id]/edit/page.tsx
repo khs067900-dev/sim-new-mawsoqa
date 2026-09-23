@@ -81,39 +81,6 @@ export default function EditProductPage() {
           taxIncluded: product.taxIncluded === false ? "false" : "true",
           installmentAvailable: product.installment?.available === true ? "true" : "false",
           installmentMonths: product.installment?.months?.toString() || "",
-        });
-
-        const mainImg = product.image || product.images?.[0] || "";
-        if (mainImg) {
-          setImageUrl(mainImg);
-          setImagePreview(mainImg);
-        }
-
-        // Load gallery images (plain)
-        if (product.images?.length > 1) {
-          setGalleryImages(product.images.slice(1));
-        }
-
-        // Load gallery with captions
-        if (product.gallery?.length) {
-          const g: GalleryItem[] = [
-            product.gallery[0] || { url: "", caption: "" },
-            product.gallery[1] || { url: "", caption: "" },
-            product.gallery[2] || { url: "", caption: "" },
-          ];
-          setGallery(g);
-        }
-
-        // Load specifications
-        if (product.specifications?.length) {
-          setSpecifications(product.specifications);
-        }
-
-        // Load rating
-        if (product.rating) {
-          setRating({
-            average: product.rating.average?.toString() || "",
-            count: product.rating.count?.toString() || "",
           });
         }
 

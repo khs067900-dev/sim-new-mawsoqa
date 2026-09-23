@@ -186,6 +186,15 @@ export default function FilesPage() {
     } catch { showMsg(section, "❌ خطأ في الشبكة"); }
   }
 
+  async function deleteImage(field: "qrImage" | "img1" | "img2", section: string) {
+    try {
+      const r = await fetch(`/api/admin/company/image/${field}`, { method: "DELETE", credentials: "include" });
+      const json = await r.json();
+      if (!r.ok) { showMsg(section, `❌ ${json.error || "فشل الحذف"}`); return; }
+      setData((p) => ({ ...p, [field]: "" }));
+    } catch { showMsg(section, "❌ خطأ في الشبكة"); }
+  }
+
   async function saveSection(section: string, body: object) {
     setSavingSection(section);
     try {
@@ -244,7 +253,7 @@ export default function FilesPage() {
                 onChange={(e) => e.target.files?.[0] && uploadQr(e.target.files[0])} />
             </div>
             {data.qrImage && (
-              <button onClick={() => { setData((p) => ({ ...p, qrImage: "" })); saveSection("qr", { qrImage: "" }); }}
+              <button onClick={() => deleteImage("qrImage", "qr")}
                 className="absolute -top-2 -left-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow">
                 <FiTrash2 size={10} />
               </button>
@@ -460,7 +469,7 @@ export default function FilesPage() {
                 onChange={(e) => e.target.files?.[0] && uploadImg1(e.target.files[0])} />
             </div>
             {data.img1 && (
-              <button onClick={() => { setData((p) => ({ ...p, img1: "" })); saveSection("s1", { img1: "" }); }}
+              <button onClick={() => deleteImage("img1", "s1")}
                 className="absolute -top-2 -left-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow">
                 <FiTrash2 size={10} />
               </button>
@@ -557,7 +566,7 @@ export default function FilesPage() {
                 onChange={(e) => e.target.files?.[0] && uploadImg2(e.target.files[0])} />
             </div>
             {data.img2 && (
-              <button onClick={() => { setData((p) => ({ ...p, img2: "" })); saveSection("s2", { img2: "" }); }}
+              <button onClick={() => deleteImage("img2", "s2")}
                 className="absolute -top-2 -left-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow">
                 <FiTrash2 size={10} />
               </button>

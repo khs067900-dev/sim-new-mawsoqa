@@ -26,7 +26,105 @@ const EditIcon = () => (
   </svg>
 );
 
+import React from 'react';
+
 const emptyForm = { name: "", comment: "", rating: 5, gender: "male", approved: false };
+
+const stars = (n: number) => "★".repeat(n) + "☆".repeat(5 - n);
+const truncateComment = (text: string, limit = 40) => {
+  return text.length <= limit ? text : text.slice(0, limit) + "...";
+};
+
+type ReviewProps = {
+  review: Review;
+  onToggleApproved: (id: string) => void;
+  onOpenEdit: (r: Review) => void;
+  onConfirmDelete: (id: string) => void;
+  onShowComment: (c: string) => void;
+};
+
+const ReviewRow = React.memo(function ReviewRow({ review: r, onToggleApproved, onOpenEdit, onConfirmDelete, onShowComment }: ReviewProps) {
+  return (
+    <tr className="hover:bg-gray-50">
+      <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">{r.name}</td>
+      <td className="px-4 py-3 text-gray-600 max-w-xs">
+        <button onClick={() => onShowComment(r.comment)} className="text-right hover:text-blue-600 cursor-pointer transition-colors">
+          {truncateComment(r.comment)}
+        </button>
+      </td>
+      <td className="px-4 py-3 text-gray-600">{r.gender === "female" ? "أنثى" : "ذكر"}</td>
+      <td className="px-4 py-3">
+        <span className="text-yellow-400">{stars(r.rating)}</span>
+        <span className="text-gray-400 text-xs mr-1">({r.rating})</span>
+      </td>
+      <td className="px-4 py-3">
+        <button
+          onClick={() => onToggleApproved(r._id)}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${r.approved ? "bg-green-500" : "bg-gray-300"}`}
+        >
+          <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${r.approved ? "translate-x-6" : "translate-x-1"}`} />
+        </button>
+      </td>
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-2">
+          <button onClick={() => onOpenEdit(r)} className="text-blue-500 hover:text-blue-700"><EditIcon /></button>
+          <button onClick={() => onConfirmDelete(r._id)} className="text-red-500 hover:text-red-700"><TrashIcon /></button>
+        </div>
+      </td>
+    </tr>
+  );
+}, (prev, next) => {
+  return (
+    prev.review._id === next.review._id &&
+    prev.review.name === next.review.name &&
+    prev.review.approved === next.review.approved &&
+    prev.review.rating === next.review.rating &&
+    prev.review.comment === next.review.comment &&
+    prev.review.gender === next.review.gender
+  );
+});
+
+const ReviewCard = React.memo(function ReviewCard({ review: r, onToggleApproved, onOpenEdit, onConfirmDelete, onShowComment }: ReviewProps) {
+  return (
+    <div className="p-4 space-y-2">
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <p className="font-semibold text-gray-800 text-base">{r.name}</p>
+          <p className="text-xs text-gray-400">{r.gender === "female" ? "أنثى" : "ذكر"}</p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button onClick={() => onOpenEdit(r)} className="text-blue-500 hover:text-blue-700 p-1"><EditIcon /></button>
+          <button onClick={() => onConfirmDelete(r._id)} className="text-red-500 hover:text-red-700 p-1"><TrashIcon /></button>
+        </div>
+      </div>
+      <button onClick={() => onShowComment(r.comment)} className="text-sm text-gray-600 leading-relaxed text-right hover:text-blue-600 cursor-pointer transition-colors">{truncateComment(r.comment)}</button>
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <span className="text-yellow-400 text-base">{stars(r.rating)}</span>
+          <span className="text-gray-400 text-xs mr-1">({r.rating})</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">{r.approved ? "معروض" : "مخفي"}</span>
+          <button
+            onClick={() => onToggleApproved(r._id)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${r.approved ? "bg-green-500" : "bg-gray-300"}`}
+          >
+            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${r.approved ? "translate-x-6" : "translate-x-1"}`} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}, (prev, next) => {
+  return (
+    prev.review._id === next.review._id &&
+    prev.review.name === next.review.name &&
+    prev.review.approved === next.review.approved &&
+    prev.review.rating === next.review.rating &&
+    prev.review.comment === next.review.comment &&
+    prev.review.gender === next.review.gender
+  );
+});
 
 export default function ReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -113,10 +211,6 @@ export default function ReviewsPage() {
 
   function handleSearch(val: string) { setSearch(val); setPage(1); }
 
-  const stars = (n: number) => "★".repeat(n) + "☆".repeat(5 - n);
-  const truncateComment = (text: string, limit = 40) => {
-    return text.length <= limit ? text : text.slice(0, limit) + "...";
-  };
 
   const inputCls = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
 
@@ -169,33 +263,14 @@ export default function ReviewsPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {paginated.map((r) => (
-                <tr key={r._id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">{r.name}</td>
-                  <td className="px-4 py-3 text-gray-600 max-w-xs">
-                    <button onClick={() => setCommentPopup(r.comment)} className="text-right hover:text-blue-600 cursor-pointer transition-colors">
-                      {truncateComment(r.comment)}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">{r.gender === "female" ? "أنثى" : "ذكر"}</td>
-                  <td className="px-4 py-3">
-                    <span className="text-yellow-400">{stars(r.rating)}</span>
-                    <span className="text-gray-400 text-xs mr-1">({r.rating})</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() => toggleApproved(r._id)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${r.approved ? "bg-green-500" : "bg-gray-300"}`}
-                    >
-                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${r.approved ? "translate-x-6" : "translate-x-1"}`} />
-                    </button>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => openEdit(r)} className="text-blue-500 hover:text-blue-700"><EditIcon /></button>
-                      <button onClick={() => setConfirmDelete(r._id)} className="text-red-500 hover:text-red-700"><TrashIcon /></button>
-                    </div>
-                  </td>
-                </tr>
+                <ReviewRow
+                  key={r._id}
+                  review={r}
+                  onToggleApproved={toggleApproved}
+                  onOpenEdit={openEdit}
+                  onConfirmDelete={setConfirmDelete}
+                  onShowComment={setCommentPopup}
+                />
               ))}
               {paginated.length === 0 && (
                 <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">لا توجد نتائج</td></tr>
@@ -210,34 +285,14 @@ export default function ReviewsPage() {
             <p className="px-4 py-8 text-center text-gray-400 text-sm">لا توجد نتائج</p>
           )}
           {paginated.map((r) => (
-            <div key={r._id} className="p-4 space-y-2">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-semibold text-gray-800 text-base">{r.name}</p>
-                  <p className="text-xs text-gray-400">{r.gender === "female" ? "أنثى" : "ذكر"}</p>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button onClick={() => openEdit(r)} className="text-blue-500 hover:text-blue-700 p-1"><EditIcon /></button>
-                  <button onClick={() => setConfirmDelete(r._id)} className="text-red-500 hover:text-red-700 p-1"><TrashIcon /></button>
-                </div>
-              </div>
-              <button onClick={() => setCommentPopup(r.comment)} className="text-sm text-gray-600 leading-relaxed text-right hover:text-blue-600 cursor-pointer transition-colors">{truncateComment(r.comment)}</button>
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div>
-                  <span className="text-yellow-400 text-base">{stars(r.rating)}</span>
-                  <span className="text-gray-400 text-xs mr-1">({r.rating})</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500">{r.approved ? "معروض" : "مخفي"}</span>
-                  <button
-                    onClick={() => toggleApproved(r._id)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${r.approved ? "bg-green-500" : "bg-gray-300"}`}
-                  >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200 ${r.approved ? "translate-x-6" : "translate-x-1"}`} />
-                  </button>
-                </div>
-              </div>
-            </div>
+            <ReviewCard
+              key={r._id}
+              review={r}
+              onToggleApproved={toggleApproved}
+              onOpenEdit={openEdit}
+              onConfirmDelete={setConfirmDelete}
+              onShowComment={setCommentPopup}
+            />
           ))}
         </div>
 
