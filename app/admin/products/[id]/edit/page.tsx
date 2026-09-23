@@ -81,18 +81,6 @@ export default function EditProductPage() {
           taxIncluded: product.taxIncluded === false ? "false" : "true",
           installmentAvailable: product.installment?.available === true ? "true" : "false",
           installmentMonths: product.installment?.months?.toString() || "",
-          });
-        }
-
-        // Load reviews
-        if (product.reviews?.length) {
-          setReviews(product.reviews.map((r: ReviewItem) => ({ ...r, rate: r.rate?.toString() || "" })));
-        }
-      }
-      setLoading(false);
-    });
-  }, [id]);
-
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }

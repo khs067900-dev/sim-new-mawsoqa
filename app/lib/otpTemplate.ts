@@ -52,5 +52,5 @@ export function otpEmailTemplate(otp: string): string {
     </tr>
   </table>
 </body>
-</html>\`;
+</html>`;
 }
