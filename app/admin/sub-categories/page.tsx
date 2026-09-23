@@ -17,6 +17,80 @@ function useDebounce<T extends (...args: Parameters<T>) => void>(fn: T, delay: n
   }, [fn, delay]);
 }
 
+import React from 'react';
+
+const BrandRow = React.memo(function BrandRow({
+  brand,
+  index,
+  setting,
+  onToggle,
+  onOrderChange,
+  onBannerDelete,
+  onBannerUpload,
+}: {
+  brand: Brand;
+  index: number;
+  setting?: BrandSetting;
+  onToggle: (name: string) => void;
+  onOrderChange: (name: string, order: number) => void;
+  onBannerDelete: (name: string, url: string) => void;
+  onBannerUpload: (name: string, file: File) => void;
+}) {
+  return (
+    <tr className="hover:bg-gray-50">
+      <td className="px-2 sm:px-4 py-3 text-gray-400 text-xs sm:text-sm">{index}</td>
+      <td className="px-2 sm:px-4 py-3 font-medium text-gray-800">{brand.name}</td>
+      <td className="px-2 sm:px-4 py-3">
+        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${brand.count > 0 ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}>
+          {brand.count} منتج
+        </span>
+      </td>
+      <td className="px-2 sm:px-4 py-3 text-center">
+        <input
+          type="checkbox"
+          checked={setting?.showInHome ?? false}
+          onChange={() => onToggle(brand.name)}
+          className="w-4 h-4 accent-blue-600 cursor-pointer"
+        />
+      </td>
+      <td className="px-2 sm:px-4 py-3 text-center">
+        <input
+          type="number"
+          min={0}
+          key={`${brand.name}-${setting?.order ?? 0}`}
+          defaultValue={setting?.order ?? 0}
+          onChange={(e) => onOrderChange(brand.name, parseInt(e.target.value) || 0)}
+          disabled={!setting?.showInHome}
+          className="w-16 border border-gray-300 rounded px-2 py-1 text-xs text-center text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-40 disabled:cursor-not-allowed"
+        />
+      </td>
+      <td className="px-2 sm:px-4 py-3 text-center">
+        <div className="flex flex-col items-center gap-1">
+          {setting?.bannerImages?.map((url) => (
+            <div key={url} className="flex items-center gap-2">
+              <img src={url} alt="banner" className="h-8 w-16 object-cover rounded border border-gray-200" />
+              <button onClick={() => onBannerDelete(brand.name, url)} className="text-red-500 hover:text-red-700 text-xs font-bold">حذف</button>
+            </div>
+          ))}
+          <label className="cursor-pointer inline-flex items-center gap-1 px-2 py-1 rounded bg-blue-50 border border-blue-200 text-blue-600 text-xs hover:bg-blue-100">
+            ↑ رفع
+            <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onBannerUpload(brand.name, f); e.target.value = ""; }} />
+          </label>
+        </div>
+      </td>
+    </tr>
+  );
+}, (prev, next) => {
+  return (
+    prev.brand.name === next.brand.name &&
+    prev.brand.count === next.brand.count &&
+    prev.index === next.index &&
+    prev.setting?.showInHome === next.setting?.showInHome &&
+    prev.setting?.order === next.setting?.order &&
+    JSON.stringify(prev.setting?.bannerImages) === JSON.stringify(next.setting?.bannerImages)
+  );
+});
+
 export default function SubCategoriesPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [settings, setSettings] = useState<BrandSetting[]>([]);
@@ -183,53 +257,18 @@ export default function SubCategoriesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {paginated.map((brand, i) => {
-                const setting = getSetting(brand.name);
-                return (
-                  <tr key={brand.name} className="hover:bg-gray-50">
-                    <td className="px-2 sm:px-4 py-3 text-gray-400 text-xs sm:text-sm">{(currentPage - 1) * PAGE_SIZE + i + 1}</td>
-                    <td className="px-2 sm:px-4 py-3 font-medium text-gray-800">{brand.name}</td>
-                    <td className="px-2 sm:px-4 py-3">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${brand.count > 0 ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}>
-                        {brand.count} منتج
-                      </span>
-                    </td>
-                    <td className="px-2 sm:px-4 py-3 text-center">
-                      <input
-                        type="checkbox"
-                        checked={setting?.showInHome ?? false}
-                        onChange={() => handleToggle(brand.name)}
-                        className="w-4 h-4 accent-blue-600 cursor-pointer"
-                      />
-                    </td>
-                    <td className="px-2 sm:px-4 py-3 text-center">
-                      <input
-                        type="number"
-                        min={0}
-                        key={`${brand.name}-${setting?.order ?? 0}`}
-                        defaultValue={setting?.order ?? 0}
-                        onChange={(e) => debouncedOrderChange(brand.name, parseInt(e.target.value) || 0)}
-                        disabled={!setting?.showInHome}
-                        className="w-16 border border-gray-300 rounded px-2 py-1 text-xs text-center text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-40 disabled:cursor-not-allowed"
-                      />
-                    </td>
-                    <td className="px-2 sm:px-4 py-3 text-center">
-                      <div className="flex flex-col items-center gap-1">
-                        {setting?.bannerImages?.map((url) => (
-                          <div key={url} className="flex items-center gap-2">
-                            <img src={url} alt="banner" className="h-8 w-16 object-cover rounded border border-gray-200" />
-                            <button onClick={() => handleBannerDelete(brand.name, url)} className="text-red-500 hover:text-red-700 text-xs font-bold">حذف</button>
-                          </div>
-                        ))}
-                        <label className="cursor-pointer inline-flex items-center gap-1 px-2 py-1 rounded bg-blue-50 border border-blue-200 text-blue-600 text-xs hover:bg-blue-100">
-                          ↑ رفع
-                          <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleBannerUpload(brand.name, f); e.target.value = ""; }} />
-                        </label>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+              {paginated.map((brand, i) => (
+                <BrandRow
+                  key={brand.name}
+                  brand={brand}
+                  index={(currentPage - 1) * PAGE_SIZE + i + 1}
+                  setting={getSetting(brand.name)}
+                  onToggle={handleToggle}
+                  onOrderChange={debouncedOrderChange}
+                  onBannerDelete={handleBannerDelete}
+                  onBannerUpload={handleBannerUpload}
+                />
+              ))}
               {paginated.length === 0 && (
                 <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400 text-sm">لا توجد براندات</td></tr>
               )}

@@ -22,7 +22,7 @@ export default function EditProductPage() {
   const [galleryLinkInput, setGalleryLinkInput] = useState("");
   const [uploading, setUploading] = useState(false);
   const [imagesGalleryUploading, setImagesGalleryUploading] = useState(false);
-  const [galleryUploading, setGalleryUploading] = useState<number | null>(null);
+  
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<SubCat[]>([]);

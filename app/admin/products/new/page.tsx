@@ -21,7 +21,7 @@ export default function NewProductPage() {
   const [galleryLinkInput, setGalleryLinkInput] = useState("");
   const [uploading, setUploading] = useState(false);
   const [imagesGalleryUploading, setImagesGalleryUploading] = useState(false);
-  const [galleryUploading, setGalleryUploading] = useState<number | null>(null);
+  
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<SubCat[]>([]);
 
@@ -180,7 +180,7 @@ export default function NewProductPage() {
     if (!form.name || !form.originalPrice) return toast.error("الاسم والسعر مطلوبان");
     setSaving(true);
     try {
-            const body: Record<string, unknown> = {
+                  const body: Record<string, unknown> = {
         name: form.name,
         brief: form.brief,
         originalPrice: Number(form.originalPrice),
