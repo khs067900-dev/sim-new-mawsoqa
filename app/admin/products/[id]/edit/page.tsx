@@ -342,14 +342,6 @@ export default function EditProductPage() {
                     ))}
                   </div>
                 )}
-                <button
-                  type="button"
-                  onClick={() => imagesGalleryRef.current?.click()}
-                  disabled={imagesGalleryUploading}
-                  className="w-full border-2 border-dashed border-gray-300 rounded-lg py-3 text-sm text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors disabled:opacity-50"
-                >
-                  {imagesGalleryUploading ? "جاري الرفع..." : "📁 رفع صورة للجاليري"}
-                </button>
                 <input ref={imagesGalleryRef} type="file" accept="image/*" className="hidden" onChange={handleImagesGalleryFile} />
                 <div className="flex gap-2 mt-2">
                   <input
@@ -516,67 +508,6 @@ export default function EditProductPage() {
                 className={inputClass}
               />
             </div>
-          </div>
-
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-gray-700">المراجعات</h3>
-            <button
-              type="button"
-              onClick={() => setReviews((prev) => [...prev, { name: "", rate: "", comment: "", date: "" }])}
-              className="bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-medium"
-            >
-              + إضافة مراجعة
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            {reviews.map((review, rIndex) => (
-              <div key={rIndex} className="border border-gray-200 rounded-xl p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs text-gray-400">مراجعة {rIndex + 1}</span>
-                  {reviews.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => setReviews((prev) => prev.filter((_, i) => i !== rIndex))}
-                      className="text-red-400 hover:text-red-600 text-xs mr-auto"
-                    >
-                      🗑 حذف
-                    </button>
-                  )}
-                </div>
-                <div className="grid grid-cols-3 gap-2 mb-2">
-                  <input
-                    type="text"
-                    value={review.name}
-                    onChange={(e) => setReviews((prev) => prev.map((r, i) => (i === rIndex ? { ...r, name: e.target.value } : r)))}
-                    placeholder="اسم المراجع"
-                    className="border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    value={review.rate}
-                    onChange={(e) => setReviews((prev) => prev.map((r, i) => (i === rIndex ? { ...r, rate: e.target.value } : r)))}
-                    placeholder="التقييم (1-5)"
-                    className="border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <input
-                    type="date"
-                    value={review.date}
-                    onChange={(e) => setReviews((prev) => prev.map((r, i) => (i === rIndex ? { ...r, date: e.target.value } : r)))}
-                    className="border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <input
-                  type="text"
-                  value={review.comment}
-                  onChange={(e) => setReviews((prev) => prev.map((r, i) => (i === rIndex ? { ...r, comment: e.target.value } : r)))}
-                  placeholder="التعليق..."
-                  className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            ))}
           </div>
         </div>
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { getBackend } from "../../../_lib";
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ key: string }> }) {
@@ -10,6 +11,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ k
       headers: { cookie },
     });
     const text = await res.text();
+    revalidateTag("company");
     try {
       return NextResponse.json(JSON.parse(text), { status: res.status });
     } catch {
