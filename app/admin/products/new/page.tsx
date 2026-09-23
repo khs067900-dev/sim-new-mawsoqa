@@ -136,34 +136,6 @@ export default function NewProductPage() {
     setGalleryImages((prev) => prev.filter((_, i) => i !== index));
   }
 
-  // Gallery with captions handlers
-  async function handleGalleryFile(index: number, e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setGalleryUploading(index);
-    try {
-      const url = await uploadImage(file);
-      setGallery((prev) => prev.map((g, i) => (i === index ? { ...g, url } : g)));
-      toast.success("تم رفع الصورة ✅");
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "فشل رفع الصورة");
-    } finally {
-      setGalleryUploading(null);
-    }
-  }
-
-  function updateGalleryCaption(index: number, caption: string) {
-    setGallery((prev) => prev.map((g, i) => (i === index ? { ...g, caption } : g)));
-  }
-
-  function updateGalleryUrl(index: number, url: string) {
-    setGallery((prev) => prev.map((g, i) => (i === index ? { ...g, url } : g)));
-  }
-
-  function clearGalleryItem(index: number) {
-    setGallery((prev) => prev.map((g, i) => (i === index ? { url: "", caption: "" } : g)));
-  }
-
   // Specifications handlers
   function addSpecGroup() {
     setSpecifications((prev) => [...prev, { groupName: "", items: [{ label: "", value: "" }] }]);
@@ -216,10 +188,6 @@ export default function NewProductPage() {
       if (form.salePrice) body.salePrice = Number(form.salePrice);
       if (imageUrl) body.image = imageUrl;
 
-      // Gallery with captions
-      const filledGallery = gallery.filter((g) => g.url);
-      if (filledGallery.length) body.gallery = filledGallery;
-
       // Images array (plain gallery)
       const allImages = imageUrl ? [imageUrl, ...galleryImages] : [...galleryImages];
       if (allImages.length) body.images = allImages;
@@ -235,10 +203,6 @@ export default function NewProductPage() {
       if (rating.average || rating.count) {
         body.rating = { average: Number(rating.average) || 0, count: Number(rating.count) || 0 };
       }
-
-      // Reviews
-      const filledReviews = reviews.filter((r) => r.name && r.comment);
-      if (filledReviews.length) body.reviews = filledReviews.map((r) => ({ ...r, rate: Number(r.rate) || 5 }));
 
       const res = await fetch("/api/admin/products", {
         method: "POST",
@@ -422,70 +386,6 @@ export default function NewProductPage() {
             placeholder="اكتب وصف تفصيلي كبير عن المنتج..."
             className={`${inputClass} resize-none`}
           />
-        </div>
-
-        {/* القسم الثالث - الجاليري (3 صور مع كلام) */}
-        <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">جاليري الصور (3 صور مع وصف)</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {gallery.map((item, index) => (
-              <div key={index} className="border border-gray-200 rounded-xl p-3 space-y-3">
-                <p className="text-xs font-medium text-gray-500">صورة {index + 1}</p>
-                {item.url ? (
-                  <div className="relative h-36 rounded-lg overflow-hidden border border-gray-100">
-                    <img src={item.url} alt={`gallery-${index}`} className="w-full h-full object-cover" />
-                    {galleryUploading === index && (
-                      <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
-                        <span className="text-xs text-blue-600">جاري الرفع...</span>
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => clearGalleryItem(index)}
-                      className="absolute top-1 left-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ) : (
-                  <div
-                    onClick={() => galleryFileRefs.current[index]?.click()}
-                    className="h-36 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 transition-colors"
-                  >
-                    {galleryUploading === index ? (
-                      <span className="text-xs text-blue-600">جاري الرفع...</span>
-                    ) : (
-                      <>
-                        <span className="text-2xl text-gray-200">📷</span>
-                        <span className="text-xs text-gray-400 mt-1">اضغط للرفع</span>
-                      </>
-                    )}
-                  </div>
-                )}
-                <input
-                  ref={(el) => { galleryFileRefs.current[index] = el; }}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleGalleryFile(index, e)}
-                />
-                <input
-                  type="text"
-                  value={item.url}
-                  onChange={(e) => updateGalleryUrl(index, e.target.value)}
-                  placeholder="رابط الصورة..."
-                  className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  value={item.caption}
-                  onChange={(e) => updateGalleryCaption(index, e.target.value)}
-                  placeholder="الكلام على الصورة..."
-                  className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* القسم الرابع - المواصفات */}

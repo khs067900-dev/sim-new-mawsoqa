@@ -25,14 +25,6 @@ export function InfoRow({ label, value, dir }: { label: string; value?: string; 
   );
 }
 
-export function SummaryRow({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-gray-500">{label}</span>
-      <span className="font-semibold text-gray-800">{value}</span>
-    </div>
-  );
-}
 
 export function FinField({ label, value, onChange, integer }: {
   label: string; value: number; onChange: (v: number) => void; integer?: boolean;

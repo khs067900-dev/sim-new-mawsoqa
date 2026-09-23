@@ -23,7 +23,7 @@ export async function sendEmail({
   html: string;
 }): Promise<void> {
   const resend = getResend();
-  const from = `${process.env.RESEND_FROM_NAME || "الشريحة الموثوقة"} <${process.env.RESEND_FROM_EMAIL || "no-reply@alshariha.com"}>`;
+  const from = `${process.env.RESEND_FROM_NAME || "لمسه الثابته"} <${process.env.RESEND_FROM_EMAIL || "no-reply@alshareehasim.com"}>`;
 
   const { error } = await resend.emails.send({ from, to, subject, html });
   if (error) throw new Error(error.message);

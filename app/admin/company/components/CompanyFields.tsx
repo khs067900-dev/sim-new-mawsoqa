@@ -14,11 +14,11 @@ const ltrFields = ["phone", "whatsapp", "website", "email", "taxNumber"];
 
 const FieldInput = memo(function FieldInput({
   fieldKey,
-  data,
+  value,
   onChange,
 }: {
   fieldKey: string;
-  data: CompanyData;
+  value: string;
   onChange: (k: string, v: string) => void;
 }) {
   const label = fields.find((f) => f.key === fieldKey)?.label;
@@ -26,7 +26,7 @@ const FieldInput = memo(function FieldInput({
     <div>
       <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1">{label}</label>
       <input
-        value={data[fieldKey] || ""}
+        value={value || ""}
         onChange={(e) => onChange(fieldKey, e.target.value)}
         className={inputClass}
         dir={ltrFields.includes(fieldKey) ? "ltr" : undefined}
@@ -35,26 +35,26 @@ const FieldInput = memo(function FieldInput({
   );
 });
 
-const CompanyFields = memo(function CompanyFields({ data, onChange }: CompanyFieldsProps) {
+const CompanyFields = function CompanyFields({ data, onChange }: CompanyFieldsProps) {
   return (
     <div className="space-y-4 sm:space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
-        {["nameAr", "nameEn"].map((k) => <FieldInput key={k} fieldKey={k} data={data} onChange={onChange} />)}
+        {["nameAr", "nameEn"].map((k) => <FieldInput key={k} fieldKey={k} value={data[k as keyof CompanyData]} onChange={onChange} />)}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
-        {["addressAr", "addressEn"].map((k) => <FieldInput key={k} fieldKey={k} data={data} onChange={onChange} />)}
+        {["addressAr", "addressEn"].map((k) => <FieldInput key={k} fieldKey={k} value={data[k as keyof CompanyData]} onChange={onChange} />)}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
-        {["phone", "whatsapp"].map((k) => <FieldInput key={k} fieldKey={k} data={data} onChange={onChange} />)}
+        {["phone", "whatsapp"].map((k) => <FieldInput key={k} fieldKey={k} value={data[k as keyof CompanyData]} onChange={onChange} />)}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
-        {["website", "email"].map((k) => <FieldInput key={k} fieldKey={k} data={data} onChange={onChange} />)}
+        {["website", "email"].map((k) => <FieldInput key={k} fieldKey={k} value={data[k as keyof CompanyData]} onChange={onChange} />)}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
-        {["currencyAr", "currencyEn"].map((k) => <FieldInput key={k} fieldKey={k} data={data} onChange={onChange} />)}
+        {["currencyAr", "currencyEn"].map((k) => <FieldInput key={k} fieldKey={k} value={data[k as keyof CompanyData]} onChange={onChange} />)}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
-        {["taxNumber", "shippingCompany"].map((k) => <FieldInput key={k} fieldKey={k} data={data} onChange={onChange} />)}
+        {["taxNumber", "shippingCompany"].map((k) => <FieldInput key={k} fieldKey={k} value={data[k as keyof CompanyData]} onChange={onChange} />)}
         <div>
           <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1">طريقة الدفع</label>
           <select
@@ -78,6 +78,12 @@ const CompanyFields = memo(function CompanyFields({ data, onChange }: CompanyFie
       </div>
     </div>
   );
-});
+}
 
-export default CompanyFields;
+export default memo(CompanyFields, (prev, next) => {
+  return (
+    fields.every((f) => prev.data[f.key as keyof CompanyData] === next.data[f.key as keyof CompanyData]) &&
+    prev.data.details === next.data.details &&
+    prev.data.paymentMethod === next.data.paymentMethod
+  );
+});

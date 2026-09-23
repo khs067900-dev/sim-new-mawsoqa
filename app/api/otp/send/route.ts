@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     try {
       await sendEmail({
         to: email,
-        subject: "رمز التحقق الخاص بك | الشريحة الموثوقة",
+        subject: "رمز التحقق الخاص بك | لمسه الثابته",
         html: otpEmailTemplate(otp),
       });
     } catch {

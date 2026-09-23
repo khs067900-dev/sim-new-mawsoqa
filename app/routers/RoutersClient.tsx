@@ -13,7 +13,7 @@ import { useProductFilters } from "../(categories)/[slug]/components/useProductF
 import ProductsGrid from "../(categories)/[slug]/components/ProductsGrid";
 import AnimatedBackground from "../components/AnimatedBackground";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://alshareehasim-backend.vercel.app";
 
 const BRANDS = [
   { name: "TP-Link",  border: "border-orange-500/30", bg: "bg-orange-500/10", dot: "bg-orange-400" },

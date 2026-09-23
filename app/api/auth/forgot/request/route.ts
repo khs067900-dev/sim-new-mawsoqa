@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     try {
       await sendEmail({
         to: email,
-        subject: "رمز إعادة تعيين كلمة المرور | لمسة",
+        subject: "رمز إعادة تعيين كلمة المرور | لمسه الثابته",
         html: otpEmailTemplate(otp),
       });
     } catch {

@@ -1,4 +1,4 @@
-export const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+export const API = process.env.NEXT_PUBLIC_API_URL || "https://alshareehasim-backend.vercel.app";
 
 export const fields = [
   { key: "nameAr", label: "الاسم بالعربية" },
@@ -52,8 +52,3 @@ export const toFullUrl = (url: string) => {
   return `${API}${url}`;
 };
 
-export const withCacheBust = (url: string) => {
-  if (!url) return url;
-  const base = url.split("?")[0];
-  return `${base}?t=${Date.now()}`;
-};

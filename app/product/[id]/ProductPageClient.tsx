@@ -11,7 +11,7 @@ import ProductImages from "./components/ProductImages";
 import ProductInfo from "./components/ProductInfo";
 import ProductDetails from "./components/ProductDetails";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://alshareehasim-backend.vercel.app";
 
 export default function ProductPageClient({ id, initialProduct }: { id: string; initialProduct: Product | null }) {
   const router = useRouter();

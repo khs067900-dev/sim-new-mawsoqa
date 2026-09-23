@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getBackend, forwardCookies } from "../_lib";
 
 export async function GET(req: NextRequest) {
-  const res = await fetch(`${getBackend()}/api/admin/company`, forwardCookies(req, {}));
+  const res = await fetch(`${getBackend()}/api/admin/company`, forwardCookies(req, {
+    cache: "force-cache",
+    next: { tags: ["company"] }
+  }));
   if (!res.ok) return NextResponse.json({ error: "Backend unavailable" }, { status: res.status });
   const data = await res.json();
   return NextResponse.json(data, { status: res.status });

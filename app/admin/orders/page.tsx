@@ -42,7 +42,6 @@ export default function OrdersPage() {
   const [deleting, setDeleting] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   const buildQuery = useCallback((p: number, s: string) => {
@@ -96,13 +95,7 @@ export default function OrdersPage() {
     fetchOrders(page, debouncedSearch);
   }, [page, debouncedSearch, statusFilter, dateFrom, dateTo, sortField, sortDir, fetchOrders]);
 
-  // polling كل 30 ثانية بدلاً من 10 — بدون showLoading
-  useEffect(() => {
-    pollingRef.current = setInterval(() => {
-      fetchOrders(page, debouncedSearch, false);
-    }, 30000);
-    return () => { if (pollingRef.current) clearInterval(pollingRef.current); };
-  }, [page, debouncedSearch, fetchOrders]);
+
 
   function handleSort(field: SortField) {
     if (sortField === field) {

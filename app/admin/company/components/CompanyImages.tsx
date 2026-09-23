@@ -9,7 +9,7 @@ interface CompanyImagesProps {
   onImageDelete: (key: string) => Promise<void>;
 }
 
-const CompanyImages = memo(function CompanyImages({ data, onImageChange, onImageDelete }: CompanyImagesProps) {
+const CompanyImages = function CompanyImages({ data, onImageChange, onImageDelete }: CompanyImagesProps) {
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
 
   const handleUpload = async (key: string, file: File) => {
@@ -64,6 +64,8 @@ const CompanyImages = memo(function CompanyImages({ data, onImageChange, onImage
       </div>
     </div>
   );
-});
+}
 
-export default CompanyImages;
+export default memo(CompanyImages, (prev, next) => {
+  return imageFields.every((f) => prev.data[f.key as keyof CompanyData] === next.data[f.key as keyof CompanyData]);
+});

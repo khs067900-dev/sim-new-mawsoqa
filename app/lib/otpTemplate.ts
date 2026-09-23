@@ -26,7 +26,7 @@ export function otpEmailTemplate(otp: string): string {
         <p style="margin:0;font-size:13px;color:#94a3b8;">إذا لم تطلب هذا الرمز، يمكنك تجاهل هذه الرسالة بأمان.</p>
 
         <div style="margin:28px 0 0;padding-top:20px;border-top:1px solid #f1f5f9;font-size:12px;color:#cbd5e1;">
-          فريق العمل
+          فريق لمسه الثابته
         </div>
       </td>
     </tr>

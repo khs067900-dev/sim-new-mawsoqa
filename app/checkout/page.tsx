@@ -15,7 +15,7 @@ import type { CustomerData } from "./CustomerSection";
 import { useAuthStore } from "../store/authStore";
 
 const fmt = (n: number) => n.toLocaleString("en-US");
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://alshareehasim-backend.vercel.app";
 const resolveImg = (src: string) => src?.startsWith("http") ? src : `${API}${src}`;
 
 export default function CheckoutPage() {

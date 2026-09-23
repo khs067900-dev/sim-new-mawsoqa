@@ -18,7 +18,7 @@ interface CartItemProps {
   onRemove: (id: string) => void;
 }
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API = process.env.NEXT_PUBLIC_API_URL || "https://alshareehasim-backend.vercel.app";
 const resolveImg = (src: string) => src.startsWith("http") ? src : `${API}${src}`;
 
 export default function CartItem({ product, qty, onUpdateQty, onRemove }: CartItemProps) {
