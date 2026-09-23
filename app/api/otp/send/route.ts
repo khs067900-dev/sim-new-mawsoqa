@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "../../../lib/resendClient";
 import { otpEmailTemplate } from "../../../lib/otpTemplate";
 
-const BACKEND = process.env.BACKEND_URL || "http://localhost:5000";
+const BACKEND = process.env.BACKEND_URL || "https://alshareehasim-backend.vercel.app";
 
 export async function POST(req: NextRequest) {
   try {

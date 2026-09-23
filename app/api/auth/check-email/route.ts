@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND = process.env.BACKEND_URL || "http://localhost:5000";
+const BACKEND = process.env.BACKEND_URL || "https://alshareehasim-backend.vercel.app";
 
 // GET /api/auth/check-email?email=xxx
 export async function GET(req: NextRequest) {
