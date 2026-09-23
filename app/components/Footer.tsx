@@ -13,7 +13,8 @@ export default async function Footer({ company }: { company?: CompanyData }) {
 
   function toInlineUrl(url: string) {
     if (!url) return "";
-    return `/file-view?url=${encodeURIComponent(url)}`;
+    const absUrl = url.startsWith("http://") || url.startsWith("https://") ? url : `https://${url}`;
+    return `/file-view?url=${encodeURIComponent(absUrl)}`;
   }
 
   const qrSrc: string = c.qrImage || "";
