@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { getBackend, forwardCookies } from "../_lib";
 
 export async function GET(req: NextRequest) {
@@ -20,5 +21,6 @@ export async function PUT(req: NextRequest) {
   }));
   if (!res.ok) return NextResponse.json({ error: "Backend unavailable" }, { status: res.status });
   const data = await res.json();
+  revalidateTag("company");
   return NextResponse.json(data, { status: res.status });
 }
