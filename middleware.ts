@@ -11,7 +11,7 @@ const STATIC_CSP = [
   "img-src 'self' blob: data: https: http://localhost:5000",
   "font-src 'self' https://fonts.gstatic.com",
   "connect-src 'self' http://localhost:5000 https://*.vercel.app https://*.railway.app https://*.render.com https://*.onrender.com https://lamsa-simicard-backend.vercel.app https://alshareehasim.com https://sentry.io https://www.google-analytics.com https://maps.googleapis.com https://nominatim.openstreetmap.org https://analytics.tiktok.com https://*.tiktokw.us https://tr.snapchat.com https://*.snapchat.com https://sc-static.net",
-  "frame-src 'self' https://www.google.com",
+  "frame-src 'self' https://www.google.com https://docs.google.com",
   "object-src 'self'",
   "base-uri 'self'",
   "form-action 'self'",
