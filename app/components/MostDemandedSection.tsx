@@ -2,7 +2,7 @@ import { TrendingUp } from "lucide-react";
 import type { Product } from "./products/types";
 import ProductCard from "./products/ProductCard";
 
-const BACKEND = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "https://burj-simicard-backend.vercel.app";
+const BACKEND = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "https://alshareehasim-backend.vercel.app";
 
 function effectivePrice(p: Product): number {
   return p.salePrice ?? p.originalPrice ?? 0;

@@ -9,7 +9,7 @@ const SITE_NAME = "لمسة الثابتة";
 const BACKEND =
   process.env.BACKEND_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  "https://lamsa-simicard-backend-production.up.railway.app";
+  "https://alshareehasim-backend.vercel.app";
 
 function filterCategoryProducts(products: Product[], slug: string): Product[] {
   const config = slugConfigs[slug];

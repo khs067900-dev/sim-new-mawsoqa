@@ -4,7 +4,7 @@ import ProductPageClient from "./ProductPageClient";
 const BACKEND =
   process.env.BACKEND_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  "https://lamsa-simicard-backend-production.up.railway.app";
+  "https://alshareehasim-backend.vercel.app";
 const SITE_URL = "https://alshareehasim.com";
 
 async function getProduct(id: string) {

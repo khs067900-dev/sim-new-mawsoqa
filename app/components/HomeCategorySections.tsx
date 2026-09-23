@@ -17,7 +17,7 @@ type BrandSection = {
   bannerImages?: string[];
 };
 
-const BACKEND = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "https://burj-simicard-backend.vercel.app";
+const BACKEND = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "https://alshareehasim-backend.vercel.app";
 
 async function getSections(): Promise<BrandSection[]> {
   try {

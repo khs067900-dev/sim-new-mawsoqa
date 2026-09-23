@@ -6,6 +6,7 @@ const ALLOWED_HOSTS = [
   "backend-sahlnaha-simcard-production.up.railway.app",
   "backend-for-bsmastore-public-production-5e58.up.railway.app",
   "lamsa-simicard-backend.vercel.app",
+  "alshareehasim-backend.vercel.app",
 ];
 const ALLOWED_PREFIXES = [
   "/api/admin",
@@ -17,13 +18,13 @@ function getApiBase(): string {
   if (typeof window !== "undefined") {
     return "";
   }
-  const raw = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+  const raw = process.env.NEXT_PUBLIC_API_URL || "https://alshareehasim-backend.vercel.app";
   try {
     const { hostname, origin } = new URL(raw);
     if (!ALLOWED_HOSTS.includes(hostname)) throw new Error(`Blocked host: ${hostname}`);
     return origin;
   } catch {
-    return "http://localhost:5000";
+    return "https://alshareehasim-backend.vercel.app";
   }
 }
 

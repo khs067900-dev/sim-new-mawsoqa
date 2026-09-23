@@ -218,20 +218,25 @@ function AccountPageInner() {
     setOrdersLoading(true);
     setOrdersError("");
     try {
-      const res  = await fetch("/api/account/orders");
+      const res = await fetch("/api/account/orders");
       const data = await res.json();
-      if (!res.ok) { setOrdersError(data.error || "حدث خطأ"); return; }
+      if (!res.ok) {
+        setOrdersError(data.error || "حدث خطأ");
+        return;
+      }
       setOrders(data.orders || []);
-      setOrdersFetched(true);
     } catch {
       setOrdersError("حدث خطأ في تحميل الطلبات");
     } finally {
       setOrdersLoading(false);
+      setOrdersFetched(true);
     }
   }, []);
 
   useEffect(() => {
-    if (tab === "orders" && user && !ordersFetched && !ordersLoading) fetchOrders();
+    if (tab === "orders" && user && !ordersFetched && !ordersLoading) {
+      fetchOrders();
+    }
   }, [tab, user, ordersFetched, ordersLoading, fetchOrders]);
 
   const handleSave = async () => {

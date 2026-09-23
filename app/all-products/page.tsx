@@ -11,7 +11,7 @@ export const metadata = {
 const BACKEND =
   process.env.BACKEND_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  "https://lamsa-simicard-backend-production.up.railway.app";
+  "https://alshareehasim-backend.vercel.app";
 
 async function getProducts(brand?: string): Promise<Product[]> {
   try {
