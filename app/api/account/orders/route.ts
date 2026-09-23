@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND = process.env.BACKEND_URL || "http://localhost:5000";
+const BACKEND = process.env.BACKEND_URL || "https://alshareehasim-backend.vercel.app";
 
 export async function GET(req: NextRequest) {
   const cookie = req.headers.get("cookie") || "";
