@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
       method: "POST",
       headers: { "Content-Type": "application/json", "Origin": FRONTEND },
       body: JSON.stringify({ email, firstName, lastName, phone, password }),
+      signal: AbortSignal.timeout(8000),
     });
 
     const backendData = await backendRes.json();

@@ -1,11 +1,50 @@
 import type { Metadata } from "next";
 import { slugConfigs } from "../../lib/categoryConfig";
+import type { Product } from "../../components/products/types";
+import { sortProducts } from "../../lib/sortProducts";
 import CategoryPageClient from "./CategoryPageClient";
 
 const SITE_URL = "https://alshareehasim.com";
-// Fix 13: إزالة getCompany() من كل category page — كانت تُضيف DB call لكل slug
-// siteName ثابت — يمكن تحديثه هنا بدل جلبه من API في كل request
 const SITE_NAME = "لمسة الثابتة";
+const BACKEND =
+  process.env.BACKEND_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://lamsa-simicard-backend-production.up.railway.app";
+
+function filterCategoryProducts(products: Product[], slug: string): Product[] {
+  const config = slugConfigs[slug];
+  if (!config) return products;
+  const { brand, category, nameIncludes, nameExcludes } = config.filters;
+  return products.filter((p) => {
+    const matchBrand = brand ? p.brand?.toLowerCase() === brand.toLowerCase() : true;
+    const matchCategory = category ? p.category === category : true;
+    const matchName = nameIncludes?.length
+      ? nameIncludes.some((kw) => p.name?.toLowerCase().includes(kw.toLowerCase()))
+      : true;
+    const matchExclude = nameExcludes?.length
+      ? !nameExcludes.some((kw) => p.name?.toLowerCase().includes(kw.toLowerCase()))
+      : true;
+    return matchBrand && matchCategory && matchName && matchExclude;
+  });
+}
+
+async function getCategoryProducts(slug: string): Promise<Product[]> {
+  try {
+    const config = slugConfigs[slug];
+    const brand = config?.filters.brand ?? "";
+    const query = brand ? `?brand=${encodeURIComponent(brand)}` : "";
+    const res = await fetch(`${BACKEND}/api/products${query}`, {
+      next: { revalidate: 300, tags: ["products"] },
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const raw: Product[] = Array.isArray(data) ? data : Array.isArray(data?.products) ? data.products : [];
+    return sortProducts(filterCategoryProducts(raw, slug));
+  } catch {
+    return [];
+  }
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -44,5 +83,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CategorySlugPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  return <CategoryPageClient slug={slug} />;
+  const products = await getCategoryProducts(slug);
+  return <CategoryPageClient slug={slug} initialProducts={products} />;
 }

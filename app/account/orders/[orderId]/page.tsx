@@ -139,7 +139,14 @@ export default function OrderDetailPage() {
       try {
         const res = await fetch(`/api/account/orders/${orderId}`);
         const data = await res.json();
-        if (!res.ok) { setError(data.error || "حدث خطأ"); return; }
+        if (!res.ok) {
+          if (res.status === 401) {
+            router.replace(`/auth?redirect=/account/orders/${orderId}`);
+            return;
+          }
+          setError(data.error || "حدث خطأ");
+          return;
+        }
         setOrder(data.order || data);
       } catch {
         setError("حدث خطأ في تحميل الطلب");
@@ -148,7 +155,7 @@ export default function OrderDetailPage() {
       }
     }
     load();
-  }, [orderId]);
+  }, [orderId, router]);
 
   if (loading) return <Spinner />;
 

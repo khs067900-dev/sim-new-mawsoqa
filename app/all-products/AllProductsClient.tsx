@@ -12,26 +12,45 @@ import ProductsGrid from "../(categories)/[slug]/components/ProductsGrid";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-export default function AllProductsClient() {
+interface AllProductsClientProps {
+  initialProducts?: Product[];
+  initialBrand?: string;
+}
+
+export default function AllProductsClient({
+  initialProducts = [],
+  initialBrand = "",
+}: AllProductsClientProps) {
   const searchParams = useSearchParams();
   const brand = searchParams.get("brand") ?? "";
 
-  const [rawProducts, setRawProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const isInitialMatch = brand === initialBrand && initialProducts.length > 0;
+  const [rawProducts, setRawProducts] = useState<Product[]>(isInitialMatch ? initialProducts : []);
+  const [loading, setLoading] = useState(!isInitialMatch);
   const [page, setPage] = useState(1);
 
   const { filters, filtered } = useProductFilters(rawProducts);
 
   useEffect(() => {
+    if (brand === initialBrand && initialProducts.length > 0) {
+      setRawProducts(initialProducts);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
     const url = brand
-      ? `${API}/api/products?brand=${encodeURIComponent(brand)}`
-      : `${API}/api/products`;
+      ? `/api/products?brand=${encodeURIComponent(brand)}`
+      : `/api/products`;
     fetch(url)
       .then((r) => r.json())
-      .then((data: Product[]) => setRawProducts(sortProducts(data, !!brand)))
+      .then((data: Product[]) => {
+        const raw = Array.isArray(data) ? data : Array.isArray((data as { products?: Product[] })?.products) ? (data as { products: Product[] }).products : [];
+        setRawProducts(sortProducts(raw, !!brand));
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [brand]);
+  }, [brand, initialBrand, initialProducts]);
 
   const [prevFilters, setPrevFilters] = useState(filters);
   if (prevFilters !== filters) { setPrevFilters(filters); if (page !== 1) setPage(1); }

@@ -7,12 +7,16 @@ export const metadata = {
   description: "اختر شريحتك المناسبة من جميع شركات الاتصالات السعودية من لمسة الثابتة وتمتع باتصال سريع وتغطية قوية في كل مكان",
 };
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const BACKEND =
+  process.env.BACKEND_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://lamsa-simicard-backend-production.up.railway.app";
 
 async function getSimCards(): Promise<Product[]> {
   try {
-    const res = await fetch(`${API}/api/products?category=sim-cards`, {
-      next: { revalidate: 60 } // Revalidate every 60 seconds
+    const res = await fetch(`${BACKEND}/api/products?category=sim-cards`, {
+      next: { revalidate: 300, tags: ["products"] },
+      signal: AbortSignal.timeout(4000),
     });
     
     if (!res.ok) {

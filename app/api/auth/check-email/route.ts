@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
     const backendRes = await fetch(
       `${BACKEND}/api/customers/auth/check-email?email=${encodeURIComponent(email)}`,
-      { method: "GET" }
+      { method: "GET", signal: AbortSignal.timeout(3000) }
     );
 
     if (!backendRes.ok) {

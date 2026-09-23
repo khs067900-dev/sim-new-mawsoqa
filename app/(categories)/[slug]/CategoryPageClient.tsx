@@ -31,12 +31,18 @@ function filterProducts(products: Product[], slug: string): Product[] {
   });
 }
 
-export default function CategoryPageClient({ slug }: { slug: string }) {
+export default function CategoryPageClient({
+  slug,
+  initialProducts = [],
+}: {
+  slug: string;
+  initialProducts?: Product[];
+}) {
   const config = slugConfigs[slug];
   if (!config) notFound();
 
-  const [rawProducts, setRawProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [rawProducts, setRawProducts] = useState<Product[]>(initialProducts);
+  const [loading, setLoading] = useState(initialProducts.length === 0);
   const [page, setPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -44,14 +50,18 @@ export default function CategoryPageClient({ slug }: { slug: string }) {
     useProductFilters(rawProducts);
 
   useEffect(() => {
+    if (initialProducts.length > 0) return;
     const brand = config?.filters.brand ?? "";
     const query = brand ? `?brand=${encodeURIComponent(brand)}` : "";
-    fetch(`${API}/api/products${query}`)
+    fetch(`/api/products${query}`)
       .then((r) => r.json())
-      .then((data: Product[]) => setRawProducts(sortProducts(filterProducts(data, slug))))
+      .then((data: Product[]) => {
+        const raw = Array.isArray(data) ? data : Array.isArray((data as { products?: Product[] })?.products) ? (data as { products: Product[] }).products : [];
+        setRawProducts(sortProducts(filterProducts(raw, slug)));
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [slug, config?.filters.brand]);
+  }, [slug, config?.filters.brand, initialProducts.length]);
 
   const [prevFilters, setPrevFilters] = useState(filters);
   if (prevFilters !== filters) {

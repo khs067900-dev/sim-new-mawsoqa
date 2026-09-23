@@ -24,20 +24,24 @@ const BRANDS = [
 
 
 
-export default function RoutersClient() {
-  const [rawProducts, setRawProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function RoutersClient({ initialProducts = [] }: { initialProducts?: Product[] }) {
+  const [rawProducts, setRawProducts] = useState<Product[]>(initialProducts);
+  const [loading, setLoading] = useState(initialProducts.length === 0);
   const [page, setPage] = useState(1);
 
   const { filters, filtered } = useProductFilters(rawProducts);
 
   useEffect(() => {
+    if (initialProducts.length > 0) return;
     fetch(`/api/products?category=routers`)
       .then((r) => r.json())
-      .then((data: Product[]) => setRawProducts(sortProducts(data)))
+      .then((data: Product[]) => {
+        const raw = Array.isArray(data) ? data : Array.isArray((data as { products?: Product[] })?.products) ? (data as { products: Product[] }).products : [];
+        setRawProducts(sortProducts(raw));
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [initialProducts.length]);
 
   const [prevFilters, setPrevFilters] = useState(filters);
   if (prevFilters !== filters) { setPrevFilters(filters); if (page !== 1) setPage(1); }

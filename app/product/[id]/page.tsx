@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 import ProductPageClient from "./ProductPageClient";
 
-const BACKEND = process.env.BACKEND_URL || "http://localhost:5000";
+const BACKEND =
+  process.env.BACKEND_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://lamsa-simicard-backend-production.up.railway.app";
 const SITE_URL = "https://alshareehasim.com";
 
 async function getProduct(id: string) {
   try {
-    const r = await fetch(`${BACKEND}/api/products/${id}`, { next: { revalidate: 3600 } });
+    const r = await fetch(`${BACKEND}/api/products/${id}`, {
+      next: { revalidate: 300, tags: ["products", `product-${id}`] },
+      signal: AbortSignal.timeout(4000),
+    });
     return r.ok ? r.json() : null;
   } catch {
     return null;
