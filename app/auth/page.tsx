@@ -363,6 +363,15 @@ function RegisterForm({
         const data = await res.json();
         if (data.exists) {
           setErrors((prev) => ({ ...prev, email: "هذا البريد الإلكتروني مسجل مسبقًا" }));
+        } else {
+          setErrors((prev) => {
+            if (prev.email === "هذا البريد الإلكتروني مسجل مسبقًا") {
+              const next = { ...prev };
+              delete next.email;
+              return next;
+            }
+            return prev;
+          });
         }
       } catch { /* fail open */ } finally {
         setEmailChecking(false);
@@ -534,6 +543,8 @@ function RegisterForm({
         <div className="flex items-center justify-between text-xs text-gray-400 pt-1 border-t border-[#f0f0f0]">
           <button
             onClick={() => {
+              setErrors({});
+              setGlobalError("");
               onStateChange({ step: "form" });
               setOtp(["", "", "", "", "", ""]);
               setOtpError("");
