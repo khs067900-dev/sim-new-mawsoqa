@@ -1,14 +1,19 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { toast } from "react-hot-toast";
+
+type SubCat = { name: string; _id: string };
+type SpecItem = { label: string; value: string };
+type SpecGroup = { groupName: string; items: SpecItem[] };
+type ReviewItem = { _id: string; name: string; rating: number; comment: string };
+
+export default function EditProductPage() {
+  const router = useRouter();
+  const params = useParams();
+  const id = params?.id as string;
+
   const fileRef = useRef<HTMLInputElement>(null);
-  const galleryFileRefs = useRef<(HTMLInputElement | null)[]>([null, null, null]);
-  const imagesGalleryRef = useRef<HTMLInputElement>(null);
-  const [imageUrl, setImageUrl] = useState("");
-  const [imagePreview, setImagePreview] = useState("");
-"use client";
-import { useEffect, useRef, useState } from "react";
-  const fileRef = useRef<HTMLInputElement>(null);
-  const galleryFileRefs = useRef<(HTMLInputElement | null)[]>([null, null, null]);
   const imagesGalleryRef = useRef<HTMLInputElement>(null);
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState("");
@@ -17,13 +22,12 @@ import { useEffect, useRef, useState } from "react";
   const [galleryLinkInput, setGalleryLinkInput] = useState("");
   const [uploading, setUploading] = useState(false);
   const [imagesGalleryUploading, setImagesGalleryUploading] = useState(false);
-  
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<SubCat[]>([]);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
 
-    const [form, setForm] = useState({
+  const [form, setForm] = useState({
     name: "",
     brief: "",
     originalPrice: "",
@@ -43,14 +47,11 @@ import { useEffect, useRef, useState } from "react";
     installmentMonths: "",
   });
 
-  
-
   const [specifications, setSpecifications] = useState<SpecGroup[]>([
     { groupName: "", items: [{ label: "", value: "" }] },
   ]);
 
   const [rating, setRating] = useState({ average: "", count: "" });
-  
 
   useEffect(() => {
     Promise.all([
@@ -78,6 +79,26 @@ import { useEffect, useRef, useState } from "react";
           installmentAvailable: product.installment?.available === true ? "true" : "false",
           installmentMonths: product.installment?.months?.toString() || "",
         });
+        if (product.imageUrl) {
+          setImageUrl(product.imageUrl);
+          setImagePreview(product.imageUrl);
+        }
+        if (product.images && Array.isArray(product.images)) {
+          const gallery = product.images.filter((img: string) => img !== product.imageUrl);
+          setGalleryImages(gallery);
+        }
+        if (product.specifications && Array.isArray(product.specifications) && product.specifications.length > 0) {
+          setSpecifications(product.specifications);
+        }
+        if (product.rating) {
+          setRating({
+            average: product.rating.average?.toString() || "",
+            count: product.rating.count?.toString() || "",
+          });
+        }
+        if (product.reviews && Array.isArray(product.reviews)) {
+          setReviews(product.reviews);
+        }
       }
       setLoading(false);
     });
@@ -134,7 +155,6 @@ import { useEffect, useRef, useState } from "react";
     if (fileRef.current) fileRef.current.value = "";
   }
 
-  // Images gallery handlers (plain images)
   async function handleImagesGalleryFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -163,7 +183,6 @@ import { useEffect, useRef, useState } from "react";
     setGalleryImages((prev) => prev.filter((_, i) => i !== index));
   }
 
-  // Specifications handlers
   function addSpecGroup() {
     setSpecifications((prev) => [...prev, { groupName: "", items: [{ label: "", value: "" }] }]);
   }
@@ -216,18 +235,15 @@ import { useEffect, useRef, useState } from "react";
       if (imageUrl) body.imageUrl = imageUrl;
       else body.imageUrl = "";
 
-      // Images array (plain gallery) - always send to allow removal
       const allImages = imageUrl ? [imageUrl, ...galleryImages] : [...galleryImages];
       body.images = allImages;
 
-      // Specifications
       const filledSpecs = specifications
         .filter((g) => g.groupName)
         .map((g) => ({ ...g, items: g.items.filter((item) => item.label && item.value) }))
         .filter((g) => g.items.length > 0);
       body.specifications = filledSpecs;
 
-      // Rating
       body.rating = { average: Number(rating.average) || 0, count: Number(rating.count) || 0 };
 
       const res = await fetch(`/api/admin/products/${id}`, {
@@ -249,7 +265,8 @@ import { useEffect, useRef, useState } from "react";
 
   if (loading) return <div className="p-8 text-center text-gray-400">جاري التحميل...</div>;
 
-  const inputClass = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500";
+  const inputClass =
+    "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500";
 
   return (
     <div dir="rtl">
@@ -298,28 +315,43 @@ import { useEffect, useRef, useState } from "react";
                   className="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleMainImageLink())}
                 />
-                <button type="button" onClick={handleMainImageLink} className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium">
+                <button
+                  type="button"
+                  onClick={handleMainImageLink}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium"
+                >
                   إضافة
                 </button>
               </div>
               {imagePreview && (
                 <div className="flex gap-2 mt-2">
-                  <button type="button" onClick={() => fileRef.current?.click()} className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 rounded-lg text-xs font-medium">
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-1.5 rounded-lg text-xs font-medium"
+                  >
                     تغيير
                   </button>
-                  <button type="button" onClick={clearMainImage} className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-1.5 rounded-lg text-xs font-medium">
+                  <button
+                    type="button"
+                    onClick={clearMainImage}
+                    className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-1.5 rounded-lg text-xs font-medium"
+                  >
                     🗑 مسح
                   </button>
                 </div>
               )}
 
-              {/* صور الجاليري العادية */}
+              {/* صور الجاليري */}
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">صور الجاليري</label>
                 {galleryImages.length > 0 && (
                   <div className="grid grid-cols-3 gap-2 mb-3">
                     {galleryImages.map((img, i) => (
-                      <div key={i} className="relative group rounded-lg overflow-hidden border border-gray-200 aspect-square">
+                      <div
+                        key={i}
+                        className="relative group rounded-lg overflow-hidden border border-gray-200 aspect-square"
+                      >
                         <img src={img} alt={`gallery-${i}`} className="w-full h-full object-cover" />
                         <button
                           type="button"
@@ -332,7 +364,13 @@ import { useEffect, useRef, useState } from "react";
                     ))}
                   </div>
                 )}
-                <input ref={imagesGalleryRef} type="file" accept="image/*" className="hidden" onChange={handleImagesGalleryFile} />
+                <input
+                  ref={imagesGalleryRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImagesGalleryFile}
+                />
                 <div className="flex gap-2 mt-2">
                   <input
                     type="text"
@@ -342,10 +380,17 @@ import { useEffect, useRef, useState } from "react";
                     className="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleImagesGalleryLink())}
                   />
-                  <button type="button" onClick={handleImagesGalleryLink} className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium">
+                  <button
+                    type="button"
+                    onClick={handleImagesGalleryLink}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium"
+                  >
                     إضافة
                   </button>
                 </div>
+                {imagesGalleryUploading && (
+                  <p className="text-xs text-blue-500 mt-1">جاري الرفع...</p>
+                )}
                 <p className="text-xs text-gray-400 mt-1">عدد الصور: {galleryImages.length}</p>
               </div>
             </div>
@@ -354,22 +399,54 @@ import { useEffect, useRef, useState } from "react";
             <div className="lg:col-span-2 flex flex-col gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">اسم المنتج *</label>
-                <input name="name" value={form.name} onChange={handleChange} required placeholder="مثال: iPhone 16 Pro Max" className={inputClass} />
+                <input
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="مثال: iPhone 16 Pro Max"
+                  className={inputClass}
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">وصف قصير (Brief)</label>
-                <input name="brief" value={form.brief} onChange={handleChange} placeholder="وصف مختصر يظهر تحت اسم المنتج..." className={inputClass} />
+                <input
+                  name="brief"
+                  value={form.brief}
+                  onChange={handleChange}
+                  placeholder="وصف مختصر يظهر تحت اسم المنتج..."
+                  className={inputClass}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">السعر الأساسي (ر.س) *</label>
-                  <input name="originalPrice" type="number" min="0" step="any" value={form.originalPrice} onChange={handleChange} required placeholder="5000" className={inputClass} />
+                  <input
+                    name="originalPrice"
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={form.originalPrice}
+                    onChange={handleChange}
+                    required
+                    placeholder="5000"
+                    className={inputClass}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">سعر البيع بعد الخصم</label>
-                  <input name="salePrice" type="number" min="0" step="any" value={form.salePrice} onChange={handleChange} placeholder="4500" className={inputClass} />
+                  <input
+                    name="salePrice"
+                    type="number"
+                    min="0"
+                    step="any"
+                    value={form.salePrice}
+                    onChange={handleChange}
+                    placeholder="4500"
+                    className={inputClass}
+                  />
                 </div>
               </div>
 
@@ -379,7 +456,9 @@ import { useEffect, useRef, useState } from "react";
                   <select name="category" value={form.category} onChange={handleChange} className={inputClass}>
                     <option value="">-- اختر تصنيف --</option>
                     {categories.map((c) => (
-                      <option key={c.name} value={c.name}>{c.name}</option>
+                      <option key={c._id} value={c.name}>
+                        {c.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -408,11 +487,15 @@ import { useEffect, useRef, useState } from "react";
           />
         </div>
 
-        {/* القسم الرابع - المواصفات */}
+        {/* القسم الثالث - المواصفات */}
         <div className="bg-white rounded-xl shadow p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-800">المواصفات</h2>
-            <button type="button" onClick={addSpecGroup} className="bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-medium">
+            <button
+              type="button"
+              onClick={addSpecGroup}
+              className="bg-blue-50 hover:bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-medium"
+            >
               + إضافة قسم
             </button>
           </div>
@@ -429,7 +512,11 @@ import { useEffect, useRef, useState } from "react";
                     className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   {specifications.length > 1 && (
-                    <button type="button" onClick={() => removeSpecGroup(gIndex)} className="text-red-500 hover:text-red-700 text-sm px-2">
+                    <button
+                      type="button"
+                      onClick={() => removeSpecGroup(gIndex)}
+                      className="text-red-500 hover:text-red-700 text-sm px-2"
+                    >
                       🗑
                     </button>
                   )}
@@ -453,7 +540,11 @@ import { useEffect, useRef, useState } from "react";
                         className="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-xs text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                       {group.items.length > 1 && (
-                        <button type="button" onClick={() => removeSpecItem(gIndex, iIndex)} className="text-red-400 hover:text-red-600 text-xs">
+                        <button
+                          type="button"
+                          onClick={() => removeSpecItem(gIndex, iIndex)}
+                          className="text-red-400 hover:text-red-600 text-xs"
+                        >
                           ✕
                         </button>
                       )}
@@ -461,7 +552,11 @@ import { useEffect, useRef, useState } from "react";
                   ))}
                 </div>
 
-                <button type="button" onClick={() => addSpecItem(gIndex)} className="mt-2 text-blue-500 hover:text-blue-700 text-xs font-medium">
+                <button
+                  type="button"
+                  onClick={() => addSpecItem(gIndex)}
+                  className="mt-2 text-blue-500 hover:text-blue-700 text-xs font-medium"
+                >
                   + إضافة مواصفة
                 </button>
               </div>
@@ -469,7 +564,7 @@ import { useEffect, useRef, useState } from "react";
           </div>
         </div>
 
-        {/* القسم الخامس - التقييم والمراجعات */}
+        {/* القسم الرابع - التقييم */}
         <div className="bg-white rounded-xl shadow p-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">التقييم والمراجعات</h2>
 
@@ -499,14 +594,37 @@ import { useEffect, useRef, useState } from "react";
               />
             </div>
           </div>
+
+          {reviews.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-medium text-gray-700">المراجعات ({reviews.length})</h3>
+              {reviews.map((r) => (
+                <div key={r._id} className="border border-gray-100 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm font-medium text-gray-800">{r.name}</span>
+                    <span className="text-yellow-500 text-xs">{"★".repeat(r.rating)}</span>
+                  </div>
+                  <p className="text-xs text-gray-600">{r.comment}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* زر الحفظ */}
         <div className="flex gap-3">
-          <button type="submit" disabled={saving || uploading} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-2.5 rounded-lg text-sm font-medium transition-colors">
+          <button
+            type="submit"
+            disabled={saving || uploading}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
+          >
             {saving ? "جاري الحفظ..." : "حفظ التعديلات"}
           </button>
-          <button type="button" onClick={() => router.back()} className="px-8 border border-gray-300 text-gray-600 hover:bg-gray-50 py-2.5 rounded-lg text-sm font-medium transition-colors">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="px-8 border border-gray-300 text-gray-600 hover:bg-gray-50 py-2.5 rounded-lg text-sm font-medium transition-colors"
+          >
             إلغاء
           </button>
         </div>

@@ -23,6 +23,7 @@ export default function CartPage() {
   const [showPopup, setShowPopup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
+  const [finalOrderTotal, setFinalOrderTotal] = useState(0);
   const [name, setName] = useState("");
   const [nationalId, setNationalId] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
@@ -62,13 +63,15 @@ export default function CartPage() {
     } catch { /* silent */ }
     setLoading(false);
     setCustomer({ name, nationalId, whatsapp, address, installmentType: "full", months: 0, downPayment: 0 });
+    setFinalOrderTotal(total);
+    clear();
     setShowModal(false);
     setShowPopup(true);
   };
 
   if (!mounted) return null;
 
-  if (items.length === 0)
+  if (items.length === 0 && !showPopup)
     return (
       <>
         <AnimatedBackground />
@@ -114,7 +117,7 @@ export default function CartPage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: "rgba(0,0,0,0.55)" }}
-          onClick={() => { setShowPopup(false); clear(); }}
+          onClick={() => { setShowPopup(false); router.replace("/"); }}
         >
           <div
             className="relative w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl"
@@ -143,7 +146,7 @@ export default function CartPage() {
                 </div>
                 <div className="border-t border-[#C8A375]/30 pt-2 flex justify-between items-center">
                   <span className="text-[#0A1C29]/50 text-xs">الإجمالي</span>
-                  <span className="text-lg font-black text-[#B5854A]">{fmt(total)} <span className="text-xs font-medium text-[#0A1C29]/40"><img src="/money-icon.webp" alt="ر.س" className="inline w-7 h-7 object-contain align-middle" /></span></span>
+                  <span className="text-lg font-black text-[#B5854A]">{fmt(finalOrderTotal)} <span className="text-xs font-medium text-[#0A1C29]/40"><img src="/money-icon.webp" alt="ر.س" className="inline w-7 h-7 object-contain align-middle" /></span></span>
                 </div>
               </div>
               <div className="flex items-center justify-center gap-2 rounded-xl border border-[#C8A375]/40 px-4 py-3 mb-4" style={{ background: "#FEFEFE" }}>
@@ -152,7 +155,7 @@ export default function CartPage() {
               </div>
               <p className="text-[#0A1C29]/50 text-xs mb-5">سيتصل بك فريقنا على رقم واتساب المسجل لتأكيد الطلب وتحديد موعد التوصيل</p>
               <button
-                onClick={() => { setShowPopup(false); clear(); }}
+                onClick={() => { setShowPopup(false); router.replace("/"); }}
                 className="w-full py-3.5 rounded-xl text-white font-black text-sm transition-all hover:opacity-90"
                 style={{ background: "linear-gradient(135deg, #B5854A 0%, #C8A375 100%)" }}
               >

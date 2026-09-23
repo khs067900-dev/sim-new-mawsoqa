@@ -7,6 +7,7 @@ type SubCat = { name: string; category: string };
 
 type SpecItem = { label: string; value: string };
 type SpecGroup = { groupName: string; items: SpecItem[] };
+type ReviewItem = { name: string; rate: string; comment: string; date: string };
 
 
 export default function NewProductPage() {
@@ -24,6 +25,7 @@ export default function NewProductPage() {
   
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<SubCat[]>([]);
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
 
     const [form, setForm] = useState({
     name: "",
