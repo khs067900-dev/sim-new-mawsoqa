@@ -681,6 +681,20 @@ function RegisterForm({
       <Btn onClick={handleSendOtp} loading={loading} disabled={emailChecking}>
         إرسال رمز التحقق
       </Btn>
+
+      {savedState.otpExpiresAt && Date.now() < savedState.otpExpiresAt && (
+        <button
+          type="button"
+          onClick={() => {
+            setErrors({});
+            setGlobalError("");
+            onStateChange({ step: "otp" });
+          }}
+          className="w-full text-center text-xs text-[#0A1C29] hover:underline font-medium pt-1"
+        >
+          العودة لإدخال رمز التحقق الحالي ←
+        </button>
+      )}
     </div>
   );
 }
