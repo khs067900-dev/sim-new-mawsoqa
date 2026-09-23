@@ -1,17 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
-import toast from "react-hot-toast";
-
-type SubCat = { name: string; category: string };
-
-type SpecItem = { label: string; value: string };
-type SpecGroup = { groupName: string; items: SpecItem[] };
-
-
-export default function EditProductPage() {
-  const router = useRouter();
-  const { id } = useParams<{ id: string }>();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const galleryFileRefs = useRef<(HTMLInputElement | null)[]>([null, null, null]);
+  const imagesGalleryRef = useRef<HTMLInputElement>(null);
+  const [imageUrl, setImageUrl] = useState("");
+  const [imagePreview, setImagePreview] = useState("");
+"use client";
+import { useEffect, useRef, useState } from "react";
   const fileRef = useRef<HTMLInputElement>(null);
   const galleryFileRefs = useRef<(HTMLInputElement | null)[]>([null, null, null]);
   const imagesGalleryRef = useRef<HTMLInputElement>(null);
@@ -26,6 +21,7 @@ export default function EditProductPage() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<SubCat[]>([]);
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
 
     const [form, setForm] = useState({
     name: "",
@@ -81,6 +77,18 @@ export default function EditProductPage() {
           taxIncluded: product.taxIncluded === false ? "false" : "true",
           installmentAvailable: product.installment?.available === true ? "true" : "false",
           installmentMonths: product.installment?.months?.toString() || "",
+        });
+      }
+      setLoading(false);
+    });
+  }, [id]);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  async function uploadImage(file: File): Promise<string> {
+    const fd = new FormData();
     fd.append("image", file);
     const res = await fetch("/api/admin/products/upload-image", {
       method: "POST",
