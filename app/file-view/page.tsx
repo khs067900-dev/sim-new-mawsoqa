@@ -19,6 +19,12 @@ function FileViewer() {
     );
   }
 
+  // Clean URL for Google Docs Viewer
+  let cleanUrl = url.replace(/\/fl_attachment:[^/]+\//, "/");
+  if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
+    cleanUrl = `https://${cleanUrl}`;
+  }
+  const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(cleanUrl)}&embedded=true`;
   const proxyUrl = `/api/file-proxy?url=${encodeURIComponent(url)}`;
 
   return (
@@ -35,8 +41,8 @@ function FileViewer() {
         </div>
       </header>
       <iframe
-        src={`${proxyUrl}#toolbar=1&view=FitH`}
-        className="flex-1 w-full"
+        src={viewerUrl}
+        className="flex-1 w-full border-0"
         title="file-viewer"
         style={{ minHeight: "calc(100vh - 52px)" }}
       />
